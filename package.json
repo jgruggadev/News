@@ -1,0 +1,14 @@
+﻿{
+  "name": "kelley-news-briefing",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node api/daily-briefing.js"
+  },
+  "dependencies": {
+    "@octokit/rest": "latest",
+    "nodemailer": "latest",
+    "rss-parser": "latest"
+  }
+}
