@@ -1,18 +1,14 @@
 ﻿{
-  "name": "kelley-news-briefing-endpoint",
+  "name": "kelley-news-briefing",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "vercel dev",
-    "deploy": "vercel --prod"
+    "start": "vercel dev"
   },
   "dependencies": {
     "@octokit/rest": "latest",
     "nodemailer": "latest",
     "rss-parser": "latest"
-  },
-  "devDependencies": {
-    "vercel": "latest"
   }
 }
