@@ -1,0 +1,11 @@
+﻿{
+  "version": 2,
+  "functions": {
+    "api/daily-briefing.js": {
+      "maxDuration": 30
+    }
+  },
+  "routes": [
+    { "src": "/api/daily-briefing", "dest": "/api/daily-briefing.js" }
+  ]
+}
