@@ -1,7 +1,0 @@
-﻿{
-  "functions": {
-    "api/daily-briefing.js": {
-      "maxDuration": 10
-    }
-  }
-}
