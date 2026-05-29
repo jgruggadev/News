@@ -135,7 +135,7 @@ Return ONLY valid JSON — no markdown fences, no explanation, no commentary out
 }`;
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -246,7 +246,7 @@ function buildMarkdown(items, a) {
     '',
     '---',
     '',
-    '*Synthesized by Gemini 2.0 Flash · Committed automatically via GitHub Actions · 9:00 AM ET*',
+    '*Synthesized by Gemini 1.5 Flash · Committed automatically via GitHub Actions · 9:00 AM ET*',
     '',
     '*If any pillar shows CHALLENGING, open [[Living Macro Thesis]] and update before market open.*'
   ];
@@ -398,7 +398,7 @@ function buildHtml(items, a) {
 
   <!-- FOOTER -->
   <div style="background:#f4f1ec;padding:18px 40px;border-top:1px solid #e8e3da;">
-    <p style="margin:0;font-size:11px;color:#bbb;font-family:Arial,sans-serif;">Generated at 9:00 AM ET · Gemini 2.0 Flash synthesis · Committed to Obsidian vault via GitHub Actions</p>
+    <p style="margin:0;font-size:11px;color:#bbb;font-family:Arial,sans-serif;">Generated at 9:00 AM ET · Gemini 1.5 Flash synthesis · Committed to Obsidian vault via GitHub Actions</p>
   </div>
 
 </div>
