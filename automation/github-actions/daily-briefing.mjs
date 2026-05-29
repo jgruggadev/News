@@ -3,7 +3,6 @@ import path from 'node:path';
 import process from 'node:process';
 import nodemailer from 'nodemailer';
 import Parser from 'rss-parser';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const parser = new Parser({ timeout: 15000 });
 const root = process.cwd();
@@ -78,62 +77,100 @@ async function fetchItems() {
 }
 
 // ─── 3. GEMINI SYNTHESIS ──────────────────────────────────────────────────────
-// Uses official @google/generative-ai SDK with responseMimeType: 'application/json'
-// so Gemini returns clean JSON directly — no parsing hacks needed.
+// Pure fetch — no SDK, no import issues. Verbose logging so errors are visible.
+// Tries multiple models in sequence until one works.
+
+const GEMINI_MODELS = [
+  'gemini-2.5-flash-preview-05-20',
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-lite',
+  'gemini-1.5-flash-latest'
+];
+
+async function callGemini(apiKey, model, body) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  console.log(`  → trying model: ${model}`);
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const text = await res.text();
+  if (!res.ok) {
+    console.log(`  ✗ ${model} failed (${res.status}): ${text.slice(0, 300)}`);
+    return null;
+  }
+  const data = JSON.parse(text);
+  const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+  if (!raw) {
+    console.log(`  ✗ ${model} returned empty content`);
+    return null;
+  }
+  console.log(`  ✓ ${model} succeeded (${raw.length} chars)`);
+  return raw;
+}
 
 async function synthesizeWithGemini(items) {
   const apiKey = process.env.GOOGLE_AI_API_KEY;
-  if (!apiKey) {
-    console.warn('GOOGLE_AI_API_KEY not set — using fallback.');
-    return buildFallbackAnalysis(items);
-  }
+  console.log(`GOOGLE_AI_API_KEY present: ${!!apiKey} | length: ${apiKey?.length ?? 0} | prefix: ${apiKey?.slice(0,8) ?? 'none'}`);
+  if (!apiKey) throw new Error('GOOGLE_AI_API_KEY secret is not set in GitHub repository secrets.');
 
   const headlineContext = items.slice(0, 20).map((item, i) =>
-    `${i + 1}. [${item.theme}] ${clean(item.title)}\n   Source: ${clean(item.source)} | ${item.pubDate ? new Date(item.pubDate).toLocaleDateString('en-US') : 'Recent'}\n   Summary: ${clean(item.contentSnippet || '').slice(0, 220)}`
+    `${i + 1}. [${item.theme}] ${clean(item.title)}\n   Source: ${clean(item.source)} | ${item.pubDate ? new Date(item.pubDate).toLocaleDateString('en-US') : 'Recent'}\n   Summary: ${clean(item.contentSnippet || '').slice(0, 200)}`
   ).join('\n\n');
 
-  const prompt = `You are a senior sell-side macro analyst writing a morning note for one reader: John Albans, a Kelley School of Business finance student preparing for the Investment Management Workshop (IMW). Write like Bernstein: precise, non-obvious, willing to take a position. No hedge language. No filler. Every sentence must add information.
+  const prompt = `You are a senior sell-side macro analyst writing a morning note for John Albans, a Kelley finance student preparing for IMW. Write like Bernstein: precise, non-obvious, take a position. No hedge language. Every sentence adds information.
 
-John's macro framework:
-- The Consumer: U.S. consumer resilient but bifurcated by income cohort. Watch real wages, credit quality, housing, discretionary vs. staples divergence.
-- The Federal Reserve: Higher-for-longer baseline. Inflation re-acceleration is the key tail risk. Watch CPI, PCE, FOMC signals, rate-hike odds.
-- AI: Real capex cycle anchored by hyperscaler spending. Wide valuation dispersion — separate infrastructure from unproven monetization.
+John's framework:
+- Consumer: resilient but bifurcated by income cohort. Watch real wages, credit, housing.
+- Fed: higher-for-longer. Inflation re-acceleration is key tail risk. Watch CPI, PCE, FOMC.
+- AI: real capex cycle. Separate infrastructure from unproven monetization.
+Watchlist: NVDA (AI infra), WMT (low-end consumer), LMT (defense).
 
-John's watchlist: NVDA (AI infrastructure proxy), WMT (low-end consumer health), LMT (defense demand).
+Date: ${todayReadable}
 
-Today's date: ${todayReadable}
-
-Top market headlines:
+Headlines:
 ${headlineContext}
 
-Return a JSON object with these exact keys:
-- executive_view: string — 3 paragraphs separated by \\n\\n. Genuine synthesis, not a list of headlines. Identify the dominant market story, the tension in it, and the non-obvious implication.
-- what_changed: array of 4-5 strings — specific things that shifted since yesterday. Each names a concrete data point or event.
-- thesis_test: object with keys consumer, fed, ai — each has signal (CONFIRMING/NEUTRAL/CHALLENGING) and reasoning (one sentence).
-- variant_perception: string — 2-3 sentences on where consensus is wrong or what the market is mispricing.
-- deep_dive_question: string — one specific falsifiable research question tied to a company or data release.
-- watchlist: object with keys NVDA, WMT, LMT — each one sentence on today's read-through.
-- what_would_change_my_mind: array of 3 strings — specific falsifiable conditions that would require revising the thesis.`;
+Respond with ONLY a JSON object (no markdown, no code fences):
+{
+  "executive_view": "3 paragraphs separated by \\n\\n. Synthesize — find the ONE story, the tension, the non-obvious implication. No bullets.",
+  "what_changed": ["4-5 specific concrete things that shifted since yesterday"],
+  "thesis_test": {
+    "consumer": {"signal": "CONFIRMING|NEUTRAL|CHALLENGING", "reasoning": "one sentence"},
+    "fed": {"signal": "CONFIRMING|NEUTRAL|CHALLENGING", "reasoning": "one sentence"},
+    "ai": {"signal": "CONFIRMING|NEUTRAL|CHALLENGING", "reasoning": "one sentence"}
+  },
+  "variant_perception": "2-3 sentences on what market is getting wrong",
+  "deep_dive_question": "one specific falsifiable question tied to a company or data release",
+  "watchlist": {"NVDA": "one sentence", "WMT": "one sentence", "LMT": "one sentence"},
+  "what_would_change_my_mind": ["3 specific falsifiable conditions"]
+}`;
+
+  const body = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: { temperature: 0.35, maxOutputTokens: 2048 }
+  };
+
+  let raw = null;
+  for (const model of GEMINI_MODELS) {
+    raw = await callGemini(apiKey, model, body);
+    if (raw) break;
+  }
+
+  if (!raw) {
+    throw new Error('All Gemini models failed. Check API key quota and permissions at https://ai.dev/rate-limit');
+  }
+
+  // Strip any accidental markdown fences
+  const cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
-      generationConfig: {
-        temperature: 0.35,
-        maxOutputTokens: 2048,
-        responseMimeType: 'application/json'
-      }
-    });
-
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-    const parsed = JSON.parse(text);
+    const parsed = JSON.parse(cleaned);
     console.log('Gemini synthesis complete.');
     return parsed;
-  } catch (err) {
-    console.warn(`Gemini synthesis failed — using fallback.\nError: ${err.message}`);
-    return buildFallbackAnalysis(items);
+  } catch (e) {
+    throw new Error(`Gemini returned invalid JSON.\nParse error: ${e.message}\nRaw (first 500): ${cleaned.slice(0, 500)}`);
   }
 }
 
