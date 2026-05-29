@@ -22,7 +22,7 @@ jobs:
           node-version: '24'
 
       - name: Install dependencies
-        run: npm install nodemailer rss-parser
+        run: npm install nodemailer rss-parser @google/generative-ai
 
       - name: Generate briefing and send email
         env:

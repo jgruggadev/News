@@ -3,6 +3,7 @@ import path from 'node:path';
 import process from 'node:process';
 import nodemailer from 'nodemailer';
 import Parser from 'rss-parser';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const parser = new Parser({ timeout: 15000 });
 const root = process.cwd();
@@ -77,95 +78,61 @@ async function fetchItems() {
 }
 
 // ─── 3. GEMINI SYNTHESIS ──────────────────────────────────────────────────────
-// Uses gemini-2.0-flash (free tier). Returns structured JSON so we can format
-// both the email and the Obsidian markdown cleanly.
+// Uses official @google/generative-ai SDK with responseMimeType: 'application/json'
+// so Gemini returns clean JSON directly — no parsing hacks needed.
 
 async function synthesizeWithGemini(items) {
   const apiKey = process.env.GOOGLE_AI_API_KEY;
-  if (!apiKey) throw new Error('GOOGLE_AI_API_KEY secret is required. Add it in repo Settings → Secrets.');
+  if (!apiKey) {
+    console.warn('GOOGLE_AI_API_KEY not set — using fallback.');
+    return buildFallbackAnalysis(items);
+  }
 
   const headlineContext = items.slice(0, 20).map((item, i) =>
     `${i + 1}. [${item.theme}] ${clean(item.title)}\n   Source: ${clean(item.source)} | ${item.pubDate ? new Date(item.pubDate).toLocaleDateString('en-US') : 'Recent'}\n   Summary: ${clean(item.contentSnippet || '').slice(0, 220)}`
   ).join('\n\n');
 
-  const prompt = `You are a senior sell-side macro analyst writing a morning note for one reader: John Albans, a Kelley School of Business finance student preparing for the Investment Management Workshop (IMW). Write like Bernstein: precise, non-obvious, willing to take a position. No hedge language ("could potentially", "it may be worth noting"). No filler. Every sentence must add information.
+  const prompt = `You are a senior sell-side macro analyst writing a morning note for one reader: John Albans, a Kelley School of Business finance student preparing for the Investment Management Workshop (IMW). Write like Bernstein: precise, non-obvious, willing to take a position. No hedge language. No filler. Every sentence must add information.
 
-John's macro framework — three pillars:
-- The Consumer: U.S. consumer resilient but bifurcated by income cohort. Watch real wages, credit quality, housing, and discretionary vs. staples divergence.
-- The Federal Reserve: Higher-for-longer baseline. Inflation re-acceleration is the key tail risk. Watch CPI, PCE, FOMC signals, and whether rate-hike odds re-price.
-- AI: Real capex cycle anchored by hyperscaler spending (NVDA, data centers, power, cooling, memory). Wide valuation dispersion — separate infrastructure from unproven monetization.
+John's macro framework:
+- The Consumer: U.S. consumer resilient but bifurcated by income cohort. Watch real wages, credit quality, housing, discretionary vs. staples divergence.
+- The Federal Reserve: Higher-for-longer baseline. Inflation re-acceleration is the key tail risk. Watch CPI, PCE, FOMC signals, rate-hike odds.
+- AI: Real capex cycle anchored by hyperscaler spending. Wide valuation dispersion — separate infrastructure from unproven monetization.
 
-John's watchlist: NVDA (AI infrastructure proxy), WMT (low-end consumer health), LMT (defense demand / geopolitical risk).
+John's watchlist: NVDA (AI infrastructure proxy), WMT (low-end consumer health), LMT (defense demand).
 
 Today's date: ${todayReadable}
 
-Top market headlines (ranked by relevance):
+Top market headlines:
 ${headlineContext}
 
-Return ONLY valid JSON — no markdown fences, no explanation, no commentary outside the JSON. Structure:
-{
-  "executive_view": "3 substantive paragraphs separated by \\n\\n. This is the centerpiece. Synthesize — do not list headlines. Identify the ONE dominant market story, the tension within it, and the non-obvious implication a casual reader would miss. Write in full sentences, no bullets.",
-  "what_changed": [
-    "4-5 bullets: specific things that shifted since yesterday or last week. Each bullet names a concrete data point, comment, or event — not a vague theme."
-  ],
-  "thesis_test": {
-    "consumer": {
-      "signal": "CONFIRMING or NEUTRAL or CHALLENGING",
-      "reasoning": "One precise sentence tying today's evidence to John's consumer thesis."
-    },
-    "fed": {
-      "signal": "CONFIRMING or NEUTRAL or CHALLENGING",
-      "reasoning": "One precise sentence tying today's evidence to John's Fed thesis."
-    },
-    "ai": {
-      "signal": "CONFIRMING or NEUTRAL or CHALLENGING",
-      "reasoning": "One precise sentence tying today's evidence to John's AI thesis."
-    }
-  },
-  "variant_perception": "2-3 sentences. Where is consensus getting it wrong? What is the market under-pricing or over-pricing right now based on today's signals? Be specific and non-obvious.",
-  "deep_dive_question": "One specific, falsifiable research question to investigate today. Tie it to a specific company, data release, or empirical relationship — not a vague theme.",
-  "watchlist": {
-    "NVDA": "One sentence: what today's signals imply specifically for Nvidia.",
-    "WMT": "One sentence: what today's signals imply specifically for Walmart.",
-    "LMT": "One sentence: what today's signals imply specifically for Lockheed Martin."
-  },
-  "what_would_change_my_mind": [
-    "3 specific, falsifiable conditions that would require revising the overall thesis. Each names a data point, threshold, or event."
-  ]
-}`;
-
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.35, maxOutputTokens: 2048 }
-      })
-    }
-  );
-
-  if (!response.ok) {
-    const errText = await response.text();
-    console.warn(`Gemini API error ${response.status} — falling back to structured summary.\n${errText}`);
-    return buildFallbackAnalysis(items);
-  }
-
-  const data = await response.json();
-  const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-  // Strip markdown code fences if Gemini wraps the JSON
-  const cleaned = raw
-    .replace(/^```json\s*/i, '')
-    .replace(/^```\s*/i, '')
-    .replace(/\s*```$/i, '')
-    .trim();
+Return a JSON object with these exact keys:
+- executive_view: string — 3 paragraphs separated by \\n\\n. Genuine synthesis, not a list of headlines. Identify the dominant market story, the tension in it, and the non-obvious implication.
+- what_changed: array of 4-5 strings — specific things that shifted since yesterday. Each names a concrete data point or event.
+- thesis_test: object with keys consumer, fed, ai — each has signal (CONFIRMING/NEUTRAL/CHALLENGING) and reasoning (one sentence).
+- variant_perception: string — 2-3 sentences on where consensus is wrong or what the market is mispricing.
+- deep_dive_question: string — one specific falsifiable research question tied to a company or data release.
+- watchlist: object with keys NVDA, WMT, LMT — each one sentence on today's read-through.
+- what_would_change_my_mind: array of 3 strings — specific falsifiable conditions that would require revising the thesis.`;
 
   try {
-    return JSON.parse(cleaned);
-  } catch (e) {
-    console.warn(`Failed to parse Gemini JSON — falling back to structured summary.\n${e.message}`);
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash',
+      generationConfig: {
+        temperature: 0.35,
+        maxOutputTokens: 2048,
+        responseMimeType: 'application/json'
+      }
+    });
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    const parsed = JSON.parse(text);
+    console.log('Gemini synthesis complete.');
+    return parsed;
+  } catch (err) {
+    console.warn(`Gemini synthesis failed — using fallback.\nError: ${err.message}`);
     return buildFallbackAnalysis(items);
   }
 }
