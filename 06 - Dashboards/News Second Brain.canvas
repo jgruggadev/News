@@ -1,0 +1,23 @@
+{
+	"nodes":[
+		{"id":"home","type":"file","file":"00 - Home/Start Here.md","x":0,"y":0,"width":320,"height":180},
+		{"id":"brief","type":"file","file":"00 - Home/Latest Daily Briefing.md","x":420,"y":0,"width":360,"height":180},
+		{"id":"thesis","type":"file","file":"02 - Thesis/Living Macro Thesis.md","x":840,"y":0,"width":340,"height":180},
+		{"id":"ops","type":"file","file":"06 - Dashboards/News Operating System.md","x":0,"y":250,"width":340,"height":180},
+		{"id":"auto","type":"file","file":"10 - Automation/Automation Hub.md","x":420,"y":250,"width":360,"height":180},
+		{"id":"gha","type":"file","file":"10 - Automation/GitHub Actions Setup.md","x":840,"y":250,"width":340,"height":180},
+		{"id":"sources","type":"file","file":"03 - Sources/Source Library.md","x":0,"y":500,"width":340,"height":180},
+		{"id":"feedback","type":"file","file":"04 - Feedback/Feedback Log.md","x":420,"y":500,"width":360,"height":180},
+		{"id":"learning","type":"file","file":"07 - Learning/Market Learning Playbook.md","x":840,"y":500,"width":340,"height":180}
+	],
+	"edges":[
+		{"id":"e1","fromNode":"home","fromSide":"right","toNode":"brief","toSide":"left"},
+		{"id":"e2","fromNode":"brief","fromSide":"right","toNode":"thesis","toSide":"left"},
+		{"id":"e3","fromNode":"home","fromSide":"bottom","toNode":"ops","toSide":"top"},
+		{"id":"e4","fromNode":"ops","fromSide":"right","toNode":"auto","toSide":"left"},
+		{"id":"e5","fromNode":"auto","fromSide":"right","toNode":"gha","toSide":"left"},
+		{"id":"e6","fromNode":"brief","fromSide":"bottom","toNode":"feedback","toSide":"top"},
+		{"id":"e7","fromNode":"sources","fromSide":"right","toNode":"feedback","toSide":"left"},
+		{"id":"e8","fromNode":"feedback","fromSide":"right","toNode":"learning","toSide":"left"}
+	]
+}

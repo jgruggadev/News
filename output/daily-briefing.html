@@ -1,0 +1,152 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Kelley Macro Brief</title>
+<style>
+:root { --paper:#f4f0e8; --ink:#141414; --muted:#666158; --line:#cfc5b6; --panel:#fffdf8; --accent:#7b1f1f; --blue:#12395f; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font-family:Georgia, 'Times New Roman', serif; }
+.page { max-width:1180px; margin:0 auto; padding:24px 22px 56px; }
+.masthead { border-top:5px solid var(--ink); border-bottom:2px solid var(--ink); padding:16px 0 14px; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:end; }
+.kicker { font:700 12px/1.2 Arial, sans-serif; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); }
+h1 { margin:4px 0 0; font-size:42px; line-height:1; font-weight:500; letter-spacing:0; }
+.date { font:13px/1.4 Arial, sans-serif; color:var(--muted); text-align:right; }
+.tabs { display:flex; gap:8px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding:14px 0 10px; }
+.tab { border:1px solid var(--line); background:var(--panel); padding:9px 12px; font:700 13px Arial, sans-serif; cursor:pointer; color:var(--ink); }
+.tab.active { background:var(--ink); color:white; border-color:var(--ink); }
+.panel { display:none; padding-top:18px; }
+.panel.active { display:block; }
+.grid { display:grid; grid-template-columns:minmax(0,2fr) minmax(280px,1fr); gap:22px; align-items:start; }
+.box { background:var(--panel); border:1px solid var(--line); padding:18px; }
+h2 { font:700 22px/1.15 Arial, sans-serif; margin:0 0 12px; border-bottom:1px solid var(--line); padding-bottom:8px; }
+h3 { font-size:20px; line-height:1.2; margin:0 0 6px; }
+p, li { font-size:16px; line-height:1.62; }
+a { color:var(--blue); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.meta, .muted { color:var(--muted); font:13px/1.45 Arial, sans-serif; }
+.story { border-bottom:1px solid var(--line); padding:14px 0; }
+.story:first-child { padding-top:0; }
+.story:last-child { border-bottom:0; }
+.theme { margin-bottom:24px; }
+.editable { min-height:240px; padding:14px; background:white; border:1px dashed #938777; }
+textarea, input { width:100%; border:1px solid var(--line); background:white; color:var(--ink); padding:10px; font:14px Arial, sans-serif; }
+label { display:block; font:700 13px Arial, sans-serif; margin:12px 0 5px; }
+button.action { border:0; background:var(--ink); color:white; padding:10px 13px; font:700 13px Arial, sans-serif; cursor:pointer; margin-top:12px; }
+button.secondary { background:#56514a; }
+.source-list { columns:2; column-gap:28px; }
+.source-list li { break-inside:avoid; margin-bottom:8px; }
+.badge-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:0 0 18px; }
+.badge { background:var(--panel); border:1px solid var(--line); padding:12px; font:13px Arial, sans-serif; }
+.badge strong { display:block; font-size:22px; font-family:Georgia, 'Times New Roman', serif; }
+@media (max-width:900px) { .grid, .masthead { grid-template-columns:1fr; } .date { text-align:left; } h1 { font-size:34px; } .source-list { columns:1; } .badge-row { grid-template-columns:repeat(2,1fr); } }
+</style>
+</head>
+<body>
+<main class="page">
+<header class="masthead">
+  <div><div class="kicker">Investment Management Daily Intelligence</div><h1>The Kelley Macro Brief</h1></div>
+  <div class="date">Tuesday, May 5, 2026 11:11 PM<br>Freshman IMW preparation edition</div>
+</header>
+<nav class="tabs">
+  <button class="tab active" data-tab="brief">Daily Briefing</button>
+  <button class="tab" data-tab="thesis">Living Thesis</button>
+  <button class="tab" data-tab="feedback">Feedback Loop</button>
+  <button class="tab" data-tab="calendar">Macro Calendar</button>
+  <button class="tab" data-tab="sources">Sources</button>
+</nav>
+<section id="brief" class="panel active">
+  <div class="badge-row"><div class="badge"><strong>3</strong>Policy/inflation signals</div><div class="badge"><strong>10</strong>AI cycle signals</div><div class="badge"><strong>3</strong>Consumer signals</div><div class="badge"><strong>5</strong>Geopolitical signals</div></div>
+  <div class="grid"><article class="box"><h2>Executive Macro Thesis</h2><p>Todays briefing points to a market still organized around four linked questions: whether inflation is cooling enough to let policy ease, whether the consumer can keep spending without leaning too hard on credit, whether AI capital spending remains durable, and whether geopolitical shocks are raising the floor under defense, energy, and supply-chain risk.</p>
+<p>The policy mix is the first-order macro variable. I found 3 policy or inflation-sensitive headlines in the last-week source set. That matters because rate expectations are still the transmission mechanism from economic data into equity multiples. A cleaner disinflation path would broaden market leadership; renewed inflation pressure would likely favor quality balance sheets, pricing power, and cash-flow visibility.</p>
+<p>AI remains a structural growth theme, with 10 relevant headlines in the feed set. The differentiated question is no longer whether AI is important; it is whether capex, power availability, chip supply, and enterprise monetization all progress at the same time. If the buildout stays synchronized, the AI trade can broaden from semiconductors into power, cooling, networking, software, and industrial infrastructure. If monetization lags capex, valuation risk rises first in the highest-expectation names.</p>
+<p>The consumer picture is still bifurcated, with 3 relevant items. For an investment process, this argues against treating the consumer as one simple variable. Staples, value retail, premium brands, travel, housing, and credit-sensitive discretionary categories can all send different signals at once. The practical thesis is selective consumer resilience rather than blanket strength.</p>
+<p>Geopolitical and industrial coverage remains meaningful, with 5 geopolitics-linked headlines. The broad macro implication is that globalization is less efficient than it was in the 2010s. That can support defense budgets, domestic manufacturing, inventory buffers, and commodity optionality, but it can also keep inflation volatility higher than investors expect.</p>
+<p>Base case for the living thesis: moderate U.S. growth, uneven but positive disinflation, durable AI infrastructure spending, and higher strategic demand for defense and industrial capacity. The key risk is not one bad headline; it is a cluster of data showing sticky inflation, weakening labor income, or AI capex discipline arriving before AI revenue visibility.</p></article><aside class="box"><h2>Watchlist</h2><ul><li><strong>NVDA</strong> - AI infrastructure: Track capex guidance, AI demand durability, and gross margin path.</li>
+<li><strong>WMT</strong> - Consumer resilience: Monitor traffic and basket trends to assess low-end consumer health.</li>
+<li><strong>LMT</strong> - Defense demand: Watch order backlog, budget signals, and geopolitical escalation risk.</li></ul></aside></div>
+  <div class="box" style="margin-top:22px"><h2>Top Must-Read Headlines</h2><article class='story'><h3><a href='https://www.tomshardware.com/tech-industry/big-tech/big-techs-ai-spending-plans-reach-725-billion' target='_blank'>Big Tech AI capex plans could reach $725 billion in 2026</a></h3><p class='meta'>AI and Semiconductors | Tom&#39;s Hardware citing Financial Times data | Apr 30, 9:18 AM | Relevance 106</p><p>Google, Microsoft, Meta, and Amazon are expected to lift capex sharply in 2026, with AI infrastructure, memory chips, cloud backlogs, and component inflation driving the increase.</p><p><strong>Why it matters:</strong> AI is no longer only an equity narrative; it is a macro fixed-investment cycle. The risk is whether revenue growth and utilization justify the capital intensity.</p></article>
+<article class='story'><h3><a href='https://www.home.saxo/en-sg/content/articles/macro/market-quick-take---5-may-2026-05052026' target='_blank'>Market Quick Take: oil and tariff worries pressure equities while chip stocks support Asia</a></h3><p class='meta'>Macro and Markets | Saxo Bank | May 5, 7:00 AM | Relevance 86</p><p>Saxo highlighted weaker U.S. and European equities, higher volatility, higher bond yields, crude strength, and chip-led gains in Asia.</p><p><strong>Why it matters:</strong> The cross-asset message is classic inflation shock behavior: oil up, yields up, dollar firmer, and equity breadth narrower, even while AI-linked areas remain supported.</p></article>
+<article class='story'><h3><a href='https://www.theguardian.com/global/2026/may/04/ai-costs-are-coming-to-consumers' target='_blank'>AI costs are coming to consumers</a></h3><p class='meta'>AI and Semiconductors | The Guardian | May 4, 8:00 AM | Relevance 80</p><p>Large AI infrastructure spending is lifting demand for data centers and memory chips, with companies signaling that higher input costs may reach end users.</p><p><strong>Why it matters:</strong> AI is both a productivity story and a cost story. If compute scarcity raises consumer prices, the AI boom can feed back into inflation and margin pressure.</p></article>
+<article class='story'><h3><a href='https://www.businessinsider.com/us-economy-inflation-growth-ai-consumer-spending-iran-war-risk-2026-5' target='_blank'>BofA says U.S. growth relies on consumers and AI capex, while Iran war threatens both</a></h3><p class='meta'>Consumer | Business Insider | May 5, 8:00 AM | Relevance 80</p><p>Bank of America highlighted consumer spending and AI capital expenditure as the two pillars of current U.S. growth, with geopolitical oil risk as a key threat.</p><p><strong>Why it matters:</strong> This creates a strong thesis spine: the economy is resilient, but resilience is concentrated in two engines that are both exposed to energy, inflation, and confidence shocks.</p></article>
+<article class='story'><h3><a href='https://www.geopoliticsofai.com/daily/pentagon-ai-deals-capability-shift' target='_blank'>Pentagon classified deals signal AI capability shift to defense networks</a></h3><p class='meta'>Industrials and Defense | Geopolitics of AI | May 3, 2:00 AM | Relevance 76</p><p>A defense-AI brief argued that classified AI agreements are pulling frontier AI firms into defense networks, cloud systems, chips, memory, and energy infrastructure.</p><p><strong>Why it matters:</strong> This is a differentiated defense angle: future defense spending may look less like only hardware platforms and more like AI, compute, secure cloud, and power infrastructure.</p></article>
+<article class='story'><h3><a href='https://aiweekly.co/issues/ai-power-week-of-april-28-may-5-2026' target='_blank'>AI Geopolitics: America&#39;s AI market is now its military</a></h3><p class='meta'>Industrials and Defense | AI Weekly | May 5, 8:00 AM | Relevance 72</p><p>AI Weekly described Pentagon AI agreements with major technology firms and rising U.S.-China model security concerns as signs of deeper AI-defense integration.</p><p><strong>Why it matters:</strong> AI is becoming industrial policy and defense infrastructure. That supports a long-cycle thesis across cloud, chips, cybersecurity, power, and defense software.</p></article>
+<article class='story'><h3><a href='https://www.investing.com/news/commodities-news/morning-bid-gulf-singe-ai-binge-4658386' target='_blank'>Morning Bid: Gulf tensions and AI spending pull markets in opposite directions</a></h3><p class='meta'>Macro and Markets | Reuters via Investing.com | May 5, 6:48 AM | Relevance 66</p><p>Reuters framed the day as a tug-of-war between Gulf geopolitical risk, oil volatility, and upgraded U.S. earnings and AI-spending forecasts.</p><p><strong>Why it matters:</strong> This is the clearest daily macro frame: AI optimism is supporting risk appetite, but oil shocks can quickly tighten financial conditions through inflation expectations and bond yields.</p></article></div>
+  <div class="box" style="margin-top:22px"><h2>Theme Breakdown</h2><section class='theme'><h2>Macro and Markets</h2><article class='story'><h3><a href='https://www.home.saxo/en-sg/content/articles/macro/market-quick-take---5-may-2026-05052026' target='_blank'>Market Quick Take: oil and tariff worries pressure equities while chip stocks support Asia</a></h3><p class='meta'>Macro and Markets | Saxo Bank | May 5, 7:00 AM | Relevance 86</p><p>Saxo highlighted weaker U.S. and European equities, higher volatility, higher bond yields, crude strength, and chip-led gains in Asia.</p><p><strong>Why it matters:</strong> The cross-asset message is classic inflation shock behavior: oil up, yields up, dollar firmer, and equity breadth narrower, even while AI-linked areas remain supported.</p></article>
+<article class='story'><h3><a href='https://www.investing.com/news/commodities-news/morning-bid-gulf-singe-ai-binge-4658386' target='_blank'>Morning Bid: Gulf tensions and AI spending pull markets in opposite directions</a></h3><p class='meta'>Macro and Markets | Reuters via Investing.com | May 5, 6:48 AM | Relevance 66</p><p>Reuters framed the day as a tug-of-war between Gulf geopolitical risk, oil volatility, and upgraded U.S. earnings and AI-spending forecasts.</p><p><strong>Why it matters:</strong> This is the clearest daily macro frame: AI optimism is supporting risk appetite, but oil shocks can quickly tighten financial conditions through inflation expectations and bond yields.</p></article>
+<article class='story'><h3><a href='https://www.wsj.com/economy/central-banking/u-s-economy-grew-at-2-rate-in-first-quarter-6e0c18cc' target='_blank'>AI investment boosted U.S. growth while consumers tapped the brakes</a></h3><p class='meta'>Macro and Markets | Wall Street Journal | May 1, 8:00 AM | Relevance 46</p><p>U.S. GDP grew at a 2% annual rate in Q1, with AI-related business investment offsetting slower consumer spending growth.</p><p><strong>Why it matters:</strong> AI capex is becoming a measurable macro growth engine, but the slower consumer pulse argues for a selective rather than broad risk-on thesis.</p></article></section>
+<section class='theme'><h2>AI and Semiconductors</h2><article class='story'><h3><a href='https://www.tomshardware.com/tech-industry/big-tech/big-techs-ai-spending-plans-reach-725-billion' target='_blank'>Big Tech AI capex plans could reach $725 billion in 2026</a></h3><p class='meta'>AI and Semiconductors | Tom&#39;s Hardware citing Financial Times data | Apr 30, 9:18 AM | Relevance 106</p><p>Google, Microsoft, Meta, and Amazon are expected to lift capex sharply in 2026, with AI infrastructure, memory chips, cloud backlogs, and component inflation driving the increase.</p><p><strong>Why it matters:</strong> AI is no longer only an equity narrative; it is a macro fixed-investment cycle. The risk is whether revenue growth and utilization justify the capital intensity.</p></article>
+<article class='story'><h3><a href='https://www.theguardian.com/global/2026/may/04/ai-costs-are-coming-to-consumers' target='_blank'>AI costs are coming to consumers</a></h3><p class='meta'>AI and Semiconductors | The Guardian | May 4, 8:00 AM | Relevance 80</p><p>Large AI infrastructure spending is lifting demand for data centers and memory chips, with companies signaling that higher input costs may reach end users.</p><p><strong>Why it matters:</strong> AI is both a productivity story and a cost story. If compute scarcity raises consumer prices, the AI boom can feed back into inflation and margin pressure.</p></article>
+<article class='story'><h3><a href='https://www.finvestopia.com/news/palantir-intel-amd-on-semi-pinterest-duolingo-and-more-stock-market-movers-barro' target='_blank'>Palantir, Intel, AMD, ON Semi and other stock movers</a></h3><p class='meta'>AI and Semiconductors | Barron&#39;s via Finvestopia | May 5, 10:13 AM | Relevance 60</p><p>Barron&#39;s tracked AI and semiconductor-linked equity movers including Palantir, Intel, AMD and ON Semiconductor.</p><p><strong>Why it matters:</strong> Single-stock dispersion around AI remains high. That favors a thesis based on earnings quality and capex exposure rather than a simple AI label.</p></article>
+<article class='story'><h3><a href='https://www.marketwatch.com/story/like-10-manhattan-projects-going-off-all-at-once-how-ai-is-rewiring-the-global-economy-says-this-blackrock-exec-a07da7ef' target='_blank'>BlackRock technology investor says AI is rewiring the global economy</a></h3><p class='meta'>AI and Semiconductors | MarketWatch | May 5, 8:00 AM | Relevance 58</p><p>A BlackRock technology executive argued that AI capex could expand dramatically and shift value from legacy application businesses toward compute, models, and AI-native platforms.</p><p><strong>Why it matters:</strong> The key investment distinction is between AI infrastructure winners, model-layer concentration, and application businesses whose legacy moats may be eroded.</p></article></section>
+<section class='theme'><h2>Consumer</h2><article class='story'><h3><a href='https://www.businessinsider.com/us-economy-inflation-growth-ai-consumer-spending-iran-war-risk-2026-5' target='_blank'>BofA says U.S. growth relies on consumers and AI capex, while Iran war threatens both</a></h3><p class='meta'>Consumer | Business Insider | May 5, 8:00 AM | Relevance 80</p><p>Bank of America highlighted consumer spending and AI capital expenditure as the two pillars of current U.S. growth, with geopolitical oil risk as a key threat.</p><p><strong>Why it matters:</strong> This creates a strong thesis spine: the economy is resilient, but resilience is concentrated in two engines that are both exposed to energy, inflation, and confidence shocks.</p></article></section>
+<section class='theme'><h2>Geopolitics</h2><article class='story'><h3><a href='https://www.newsquawk.com/headlines/newsquawk-us-market-wrap-stocks-hit-as-oil-rallies-on-escalating-geopolitics-04-05-2026' target='_blank'>Stocks hit as oil rallies on escalating geopolitics</a></h3><p class='meta'>Geopolitics | Newsquawk | May 4, 8:34 PM | Relevance 24</p><p>Newsquawk reported equities and Treasuries lower while crude and the dollar rose after renewed Gulf tension and energy-infrastructure headlines.</p><p><strong>Why it matters:</strong> This reinforces the downside case: geopolitical events matter most when they transmit into oil, yields, and inflation risk rather than staying isolated as foreign-policy headlines.</p></article></section>
+<section class='theme'><h2>Industrials and Defense</h2><article class='story'><h3><a href='https://www.geopoliticsofai.com/daily/pentagon-ai-deals-capability-shift' target='_blank'>Pentagon classified deals signal AI capability shift to defense networks</a></h3><p class='meta'>Industrials and Defense | Geopolitics of AI | May 3, 2:00 AM | Relevance 76</p><p>A defense-AI brief argued that classified AI agreements are pulling frontier AI firms into defense networks, cloud systems, chips, memory, and energy infrastructure.</p><p><strong>Why it matters:</strong> This is a differentiated defense angle: future defense spending may look less like only hardware platforms and more like AI, compute, secure cloud, and power infrastructure.</p></article>
+<article class='story'><h3><a href='https://aiweekly.co/issues/ai-power-week-of-april-28-may-5-2026' target='_blank'>AI Geopolitics: America&#39;s AI market is now its military</a></h3><p class='meta'>Industrials and Defense | AI Weekly | May 5, 8:00 AM | Relevance 72</p><p>AI Weekly described Pentagon AI agreements with major technology firms and rising U.S.-China model security concerns as signs of deeper AI-defense integration.</p><p><strong>Why it matters:</strong> AI is becoming industrial policy and defense infrastructure. That supports a long-cycle thesis across cloud, chips, cybersecurity, power, and defense software.</p></article></section></div>
+</section>
+<section id="thesis" class="panel">
+  <div class="grid"><article class="box"><h2>Editable Macro Thesis</h2><div id="thesisBox" class="editable" contenteditable="true"><h2>My Macro Thesis (Editable Daily)</h2>
+<h3>Core View</h3>
+<ul>
+<li>The U.S. consumer remains resilient but increasingly bifurcated by income cohort.</li>
+<li>AI capex is strong and supports productivity over the medium term, but valuation dispersion is wide.</li>
+<li>Geopolitical fragmentation (U.S.-China, Europe energy security, Middle East risk) keeps supply chains and defense spending elevated.</li>
+</ul>
+<h3>What Would Change My Mind</h3>
+<ul>
+<li>Sustained deterioration in labor markets and real wage growth.</li>
+<li>Broad AI capex cuts from hyperscalers and enterprise software buyers.</li>
+<li>Durable de-escalation in geopolitical hotspots that materially lowers commodity and logistics risk premia.</li>
+</ul>
+<h3>Positioning Ideas To Track</h3>
+<ul>
+<li>Quality growth with durable pricing power in AI-linked infrastructure and software.</li>
+<li>Select industrials and defense beneficiaries of multi-year order backlogs.</li>
+<li>Consumer names with premium positioning and clear unit economics over broad discretionary beta.</li>
+</ul></div><button class="action" onclick="saveThesis()">Save in this browser</button> <button class="action secondary" onclick="resetThesis()">Reset</button><p class="meta">Browser edits are instant for your own review. Durable daily-email edits live in data/thesis.md.</p></article><aside class="box"><h2>Differentiated View Builder</h2><p>Each day, write one sentence for what changed, one sentence for what it means, and one sentence for what would change your mind.</p><ul><li>Growth: broadening or narrowing?</li><li>Inflation: cooling, sticky, or re-accelerating?</li><li>Policy: easier, patient, or tighter?</li><li>AI: capex durable or expectations stretched?</li><li>Geopolitics: temporary shock or structural risk premium?</li></ul></aside></div>
+</section>
+<section id="feedback" class="panel">
+  <div class="grid"><article class="box"><h2>Daily Feedback</h2><label>What was most useful?</label><textarea id="liked" rows="4"></textarea><label>What was missing or too shallow?</label><textarea id="disliked" rows="4"></textarea><label>Topics to emphasize tomorrow</label><input id="topics" placeholder="Example: uranium, defense primes, credit stress, private AI infra"><button class="action" onclick="saveFeedback()">Save feedback</button> <button class="action secondary" onclick="downloadFeedback()">Export feedback file</button><p class="meta">To fully internalize feedback in tomorrow's generated email, export and place it at data/feedback.json. I created the file so this can become part of the daily generation loop.</p></article><aside class="box"><h2>Stored Feedback Memory</h2><div id="feedbackLog"></div></aside></div>
+</section>
+<section id="calendar" class="panel"><div class="box"><h2>Macro Calendar Notes</h2><ul><li><strong>2026-04-03</strong> - US Nonfarm Payrolls <span class='muted'>Actual: 221K | Consensus: 205K | Prior: 198K</span><br><span>Keeps policy easing expectations gradual and data-dependent.</span></li>
+<li><strong>2026-04-10</strong> - US CPI <span class='muted'>Actual: Core CPI YoY 3.3% | Consensus: 3.3% | Prior: 3.4%</span><br><span>The Fed can stay patient; market focus shifts to trend confirmation.</span></li>
+<li><strong>2026-04-14</strong> - US PPI <span class='muted'>Actual: Core PPI YoY 2.6% | Consensus: 2.7% | Prior: 2.8%</span><br><span>Near-term margin risk is manageable but uneven by industry.</span></li>
+<li><strong>2026-04-16</strong> - US Retail Sales <span class='muted'>Actual: 0.4% MoM | Consensus: 0.3% MoM | Prior: 0.6% MoM</span><br><span>Supports the case for selective consumer exposure rather than broad beta.</span></li>
+<li><strong>2026-04-17</strong> - University of Michigan Sentiment <span class='muted'>Actual: Pending | Consensus: 67.2 | Prior: 68.0</span><br><span>Could influence short-term rate expectations and consumer-sensitive sectors.</span></li>
+<li><strong>2026-04-24</strong> - US Durable Goods Orders <span class='muted'>Actual: Pending | Consensus: 1.2% MoM | Prior: 1.8% MoM</span><br><span>Strong orders would support the manufacturing and aerospace backlog thesis.</span></li>
+<li><strong>2026-04-29</strong> - FOMC Rate Decision <span class='muted'>Actual: Pending | Consensus: Hold 5.25%-5.50% | Prior: 5.25%-5.50%</span><br><span>Defines discount-rate regime and near-term equity factor leadership.</span></li>
+<li><strong>2026-04-30</strong> - US GDP Advance <span class='muted'>Actual: Pending | Consensus: 2.0% QoQ SAAR | Prior: 2.4% QoQ SAAR</span><br><span>Sets baseline for soft-landing vs slowdown debates.</span></li></ul></div></section>
+<section id="sources" class="panel"><div class="box"><h2>News Sources Used</h2><p class="meta">All listed items were filtered to the last seven days when publication timestamps were available.</p><ol class="source-list"><li><a href='https://www.tomshardware.com/tech-industry/big-tech/big-techs-ai-spending-plans-reach-725-billion' target='_blank'>Big Tech AI capex plans could reach $725 billion in 2026</a> <span class='muted'>Tom&#39;s Hardware citing Financial Times data</span></li>
+<li><a href='https://www.home.saxo/en-sg/content/articles/macro/market-quick-take---5-may-2026-05052026' target='_blank'>Market Quick Take: oil and tariff worries pressure equities while chip stocks support Asia</a> <span class='muted'>Saxo Bank</span></li>
+<li><a href='https://www.theguardian.com/global/2026/may/04/ai-costs-are-coming-to-consumers' target='_blank'>AI costs are coming to consumers</a> <span class='muted'>The Guardian</span></li>
+<li><a href='https://www.businessinsider.com/us-economy-inflation-growth-ai-consumer-spending-iran-war-risk-2026-5' target='_blank'>BofA says U.S. growth relies on consumers and AI capex, while Iran war threatens both</a> <span class='muted'>Business Insider</span></li>
+<li><a href='https://www.geopoliticsofai.com/daily/pentagon-ai-deals-capability-shift' target='_blank'>Pentagon classified deals signal AI capability shift to defense networks</a> <span class='muted'>Geopolitics of AI</span></li>
+<li><a href='https://aiweekly.co/issues/ai-power-week-of-april-28-may-5-2026' target='_blank'>AI Geopolitics: America&#39;s AI market is now its military</a> <span class='muted'>AI Weekly</span></li>
+<li><a href='https://www.investing.com/news/commodities-news/morning-bid-gulf-singe-ai-binge-4658386' target='_blank'>Morning Bid: Gulf tensions and AI spending pull markets in opposite directions</a> <span class='muted'>Reuters via Investing.com</span></li>
+<li><a href='https://www.finvestopia.com/news/palantir-intel-amd-on-semi-pinterest-duolingo-and-more-stock-market-movers-barro' target='_blank'>Palantir, Intel, AMD, ON Semi and other stock movers</a> <span class='muted'>Barron&#39;s via Finvestopia</span></li>
+<li><a href='https://www.marketwatch.com/story/like-10-manhattan-projects-going-off-all-at-once-how-ai-is-rewiring-the-global-economy-says-this-blackrock-exec-a07da7ef' target='_blank'>BlackRock technology investor says AI is rewiring the global economy</a> <span class='muted'>MarketWatch</span></li>
+<li><a href='https://www.wsj.com/economy/central-banking/u-s-economy-grew-at-2-rate-in-first-quarter-6e0c18cc' target='_blank'>AI investment boosted U.S. growth while consumers tapped the brakes</a> <span class='muted'>Wall Street Journal</span></li>
+<li><a href='https://www.newsquawk.com/headlines/newsquawk-us-market-wrap-stocks-hit-as-oil-rallies-on-escalating-geopolitics-04-05-2026' target='_blank'>Stocks hit as oil rallies on escalating geopolitics</a> <span class='muted'>Newsquawk</span></li></ol></div></section>
+</main>
+<script>
+const tabs = document.querySelectorAll('.tab');
+const panels = document.querySelectorAll('.panel');
+tabs.forEach(btn => btn.addEventListener('click', () => { tabs.forEach(b => b.classList.remove('active')); panels.forEach(p => p.classList.remove('active')); btn.classList.add('active'); document.getElementById(btn.dataset.tab).classList.add('active'); }));
+const thesisKey = 'kelley_macro_thesis_v2';
+const thesisBox = document.getElementById('thesisBox');
+if (localStorage.getItem(thesisKey)) thesisBox.innerHTML = localStorage.getItem(thesisKey);
+function saveThesis(){ localStorage.setItem(thesisKey, thesisBox.innerHTML); alert('Saved in this browser.'); }
+function resetThesis(){ localStorage.removeItem(thesisKey); location.reload(); }
+let feedback = ;
+if (!Array.isArray(feedback)) feedback = [];
+const feedbackKey = 'kelley_macro_feedback_v2';
+const localFeedback = JSON.parse(localStorage.getItem(feedbackKey) || '[]');
+feedback = feedback.concat(localFeedback);
+function renderFeedback(){ const log = document.getElementById('feedbackLog'); if (!feedback.length) { log.innerHTML = '<p class="meta">No feedback saved yet.</p>'; return; } log.innerHTML = feedback.slice(-8).reverse().map(f => <div class="story"><p><strong></strong></p><p><strong>Liked:</strong> </p><p><strong>Improve:</strong> </p><p><strong>Next:</strong> </p></div>).join(''); }
+function saveFeedback(){ const entry = { date:new Date().toISOString(), liked:document.getElementById('liked').value, disliked:document.getElementById('disliked').value, topics:document.getElementById('topics').value }; const arr = JSON.parse(localStorage.getItem(feedbackKey) || '[]'); arr.push(entry); localStorage.setItem(feedbackKey, JSON.stringify(arr, null, 2)); feedback.push(entry); renderFeedback(); alert('Feedback saved in this browser. Export it when you want it included in future generated briefings.'); }
+function downloadFeedback(){ const blob = new Blob([JSON.stringify(feedback, null, 2)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'feedback.json'; a.click(); URL.revokeObjectURL(a.href); }
+renderFeedback();
+</script>
+</body>
+</html>

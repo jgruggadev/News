@@ -1,0 +1,17 @@
+[
+  {
+    "ticker": "NVDA",
+    "theme": "AI infrastructure",
+    "thesis": "Track capex guidance, AI demand durability, and gross margin path."
+  },
+  {
+    "ticker": "WMT",
+    "theme": "Consumer resilience",
+    "thesis": "Monitor traffic and basket trends to assess low-end consumer health."
+  },
+  {
+    "ticker": "LMT",
+    "theme": "Defense demand",
+    "thesis": "Watch order backlog, budget signals, and geopolitical escalation risk."
+  }
+]

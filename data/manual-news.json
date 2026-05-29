@@ -1,0 +1,101 @@
+﻿[
+  {
+    "Title": "Morning Bid: Gulf tensions and AI spending pull markets in opposite directions",
+    "Link": "https://www.investing.com/news/commodities-news/morning-bid-gulf-singe-ai-binge-4658386",
+    "Source": "Reuters via Investing.com",
+    "Theme": "Macro and Markets",
+    "Published": "2026-05-05T06:48:00-04:00",
+    "Description": "Reuters framed the day as a tug-of-war between Gulf geopolitical risk, oil volatility, and upgraded U.S. earnings and AI-spending forecasts.",
+    "Impact": "This is the clearest daily macro frame: AI optimism is supporting risk appetite, but oil shocks can quickly tighten financial conditions through inflation expectations and bond yields."
+  },
+  {
+    "Title": "BofA says U.S. growth relies on consumers and AI capex, while Iran war threatens both",
+    "Link": "https://www.businessinsider.com/us-economy-inflation-growth-ai-consumer-spending-iran-war-risk-2026-5",
+    "Source": "Business Insider",
+    "Theme": "Consumer",
+    "Published": "2026-05-05T08:00:00-04:00",
+    "Description": "Bank of America highlighted consumer spending and AI capital expenditure as the two pillars of current U.S. growth, with geopolitical oil risk as a key threat.",
+    "Impact": "This creates a strong thesis spine: the economy is resilient, but resilience is concentrated in two engines that are both exposed to energy, inflation, and confidence shocks."
+  },
+  {
+    "Title": "Big Tech AI capex plans could reach $725 billion in 2026",
+    "Link": "https://www.tomshardware.com/tech-industry/big-tech/big-techs-ai-spending-plans-reach-725-billion",
+    "Source": "Tom's Hardware citing Financial Times data",
+    "Theme": "AI and Semiconductors",
+    "Published": "2026-04-30T09:18:00-04:00",
+    "Description": "Google, Microsoft, Meta, and Amazon are expected to lift capex sharply in 2026, with AI infrastructure, memory chips, cloud backlogs, and component inflation driving the increase.",
+    "Impact": "AI is no longer only an equity narrative; it is a macro fixed-investment cycle. The risk is whether revenue growth and utilization justify the capital intensity."
+  },
+  {
+    "Title": "AI costs are coming to consumers",
+    "Link": "https://www.theguardian.com/global/2026/may/04/ai-costs-are-coming-to-consumers",
+    "Source": "The Guardian",
+    "Theme": "AI and Semiconductors",
+    "Published": "2026-05-04T08:00:00-04:00",
+    "Description": "Large AI infrastructure spending is lifting demand for data centers and memory chips, with companies signaling that higher input costs may reach end users.",
+    "Impact": "AI is both a productivity story and a cost story. If compute scarcity raises consumer prices, the AI boom can feed back into inflation and margin pressure."
+  },
+  {
+    "Title": "Market Quick Take: oil and tariff worries pressure equities while chip stocks support Asia",
+    "Link": "https://www.home.saxo/en-sg/content/articles/macro/market-quick-take---5-may-2026-05052026",
+    "Source": "Saxo Bank",
+    "Theme": "Macro and Markets",
+    "Published": "2026-05-05T07:00:00-04:00",
+    "Description": "Saxo highlighted weaker U.S. and European equities, higher volatility, higher bond yields, crude strength, and chip-led gains in Asia.",
+    "Impact": "The cross-asset message is classic inflation shock behavior: oil up, yields up, dollar firmer, and equity breadth narrower, even while AI-linked areas remain supported."
+  },
+  {
+    "Title": "Stocks hit as oil rallies on escalating geopolitics",
+    "Link": "https://www.newsquawk.com/headlines/newsquawk-us-market-wrap-stocks-hit-as-oil-rallies-on-escalating-geopolitics-04-05-2026",
+    "Source": "Newsquawk",
+    "Theme": "Geopolitics",
+    "Published": "2026-05-04T20:34:00-04:00",
+    "Description": "Newsquawk reported equities and Treasuries lower while crude and the dollar rose after renewed Gulf tension and energy-infrastructure headlines.",
+    "Impact": "This reinforces the downside case: geopolitical events matter most when they transmit into oil, yields, and inflation risk rather than staying isolated as foreign-policy headlines."
+  },
+  {
+    "Title": "AI Geopolitics: America's AI market is now its military",
+    "Link": "https://aiweekly.co/issues/ai-power-week-of-april-28-may-5-2026",
+    "Source": "AI Weekly",
+    "Theme": "Industrials and Defense",
+    "Published": "2026-05-05T08:00:00-04:00",
+    "Description": "AI Weekly described Pentagon AI agreements with major technology firms and rising U.S.-China model security concerns as signs of deeper AI-defense integration.",
+    "Impact": "AI is becoming industrial policy and defense infrastructure. That supports a long-cycle thesis across cloud, chips, cybersecurity, power, and defense software."
+  },
+  {
+    "Title": "Pentagon classified deals signal AI capability shift to defense networks",
+    "Link": "https://www.geopoliticsofai.com/daily/pentagon-ai-deals-capability-shift",
+    "Source": "Geopolitics of AI",
+    "Theme": "Industrials and Defense",
+    "Published": "2026-05-03T06:00:00Z",
+    "Description": "A defense-AI brief argued that classified AI agreements are pulling frontier AI firms into defense networks, cloud systems, chips, memory, and energy infrastructure.",
+    "Impact": "This is a differentiated defense angle: future defense spending may look less like only hardware platforms and more like AI, compute, secure cloud, and power infrastructure."
+  },
+  {
+    "Title": "BlackRock technology investor says AI is rewiring the global economy",
+    "Link": "https://www.marketwatch.com/story/like-10-manhattan-projects-going-off-all-at-once-how-ai-is-rewiring-the-global-economy-says-this-blackrock-exec-a07da7ef",
+    "Source": "MarketWatch",
+    "Theme": "AI and Semiconductors",
+    "Published": "2026-05-05T08:00:00-04:00",
+    "Description": "A BlackRock technology executive argued that AI capex could expand dramatically and shift value from legacy application businesses toward compute, models, and AI-native platforms.",
+    "Impact": "The key investment distinction is between AI infrastructure winners, model-layer concentration, and application businesses whose legacy moats may be eroded."
+  },
+  {
+    "Title": "Palantir, Intel, AMD, ON Semi and other stock movers",
+    "Link": "https://www.finvestopia.com/news/palantir-intel-amd-on-semi-pinterest-duolingo-and-more-stock-market-movers-barro",
+    "Source": "Barron's via Finvestopia",
+    "Theme": "AI and Semiconductors",
+    "Published": "2026-05-05T10:13:00-04:00",
+    "Description": "Barron's tracked AI and semiconductor-linked equity movers including Palantir, Intel, AMD and ON Semiconductor.",
+    "Impact": "Single-stock dispersion around AI remains high. That favors a thesis based on earnings quality and capex exposure rather than a simple AI label."
+  },
+  {
+    "Title": "AI investment boosted U.S. growth while consumers tapped the brakes",
+    "Link": "https://www.wsj.com/economy/central-banking/u-s-economy-grew-at-2-rate-in-first-quarter-6e0c18cc",
+    "Source": "Wall Street Journal",
+    "Theme": "Macro and Markets",
+    "Published": "2026-05-01T08:00:00-04:00",
+    "Description": "U.S. GDP grew at a 2% annual rate in Q1, with AI-related business investment offsetting slower consumer spending growth.",
+    "Impact": "AI capex is becoming a measurable macro growth engine, but the slower consumer pulse argues for a selective rather than broad risk-on thesis."
+  }
+]
