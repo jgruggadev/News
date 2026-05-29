@@ -1,0 +1,41 @@
+﻿name: Daily Macro Briefing
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 9:00 AM America/New_York during daylight saving time. Change to 14:00 UTC during standard time.
+    - cron: '0 13 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  briefing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install nodemailer rss-parser
+
+      - name: Generate briefing and send email
+        env:
+          SMTP_HOST: smtp.gmail.com
+          SMTP_PORT: '587'
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
+          BRIEFING_TO: ${{ secrets.BRIEFING_TO }}
+        run: node automation/github-actions/daily-briefing.mjs
+
+      - name: Commit updated Obsidian notes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Update daily macro briefing
+          file_pattern: '00 - Home/Latest Daily Briefing.md 01 - Daily Briefings/*.md'
