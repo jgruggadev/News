@@ -148,7 +148,8 @@ Return ONLY valid JSON — no markdown fences, no explanation, no commentary out
 
   if (!response.ok) {
     const errText = await response.text();
-    throw new Error(`Gemini API error ${response.status}: ${errText}`);
+    console.warn(`Gemini API error ${response.status} — falling back to structured summary.\n${errText}`);
+    return buildFallbackAnalysis(items);
   }
 
   const data = await response.json();
@@ -164,8 +165,39 @@ Return ONLY valid JSON — no markdown fences, no explanation, no commentary out
   try {
     return JSON.parse(cleaned);
   } catch (e) {
-    throw new Error(`Failed to parse Gemini JSON response.\nError: ${e.message}\nRaw output: ${cleaned.slice(0, 600)}`);
+    console.warn(`Failed to parse Gemini JSON — falling back to structured summary.\n${e.message}`);
+    return buildFallbackAnalysis(items);
   }
+}
+
+// ─── FALLBACK: structured summary if Gemini is unavailable ────────────────────
+function buildFallbackAnalysis(items) {
+  const topByTheme = {};
+  for (const item of items) {
+    if (!topByTheme[item.theme]) topByTheme[item.theme] = item;
+  }
+  const top5 = items.slice(0, 5).map(i => clean(i.title)).join('; ');
+  return {
+    executive_view: `[Gemini unavailable — structured summary]\n\nToday's top signals across ${items.length} scored headlines: ${top5}.\n\nReview the source headlines below and update the Living Macro Thesis manually if any pillar is CHALLENGING.`,
+    what_changed: items.slice(0, 5).map(i => `${clean(i.title)} — ${clean(i.source)}`),
+    thesis_test: {
+      consumer: { signal: 'NEUTRAL', reasoning: 'Manual review required — AI synthesis unavailable.' },
+      fed:      { signal: 'NEUTRAL', reasoning: 'Manual review required — AI synthesis unavailable.' },
+      ai:       { signal: 'NEUTRAL', reasoning: 'Manual review required — AI synthesis unavailable.' }
+    },
+    variant_perception: 'AI synthesis unavailable today. Review source headlines and apply the Market Learning Playbook framework manually.',
+    deep_dive_question: 'Review the top headlines below and identify the one signal most likely to move your thesis.',
+    watchlist: {
+      NVDA: 'Manual review required.',
+      WMT:  'Manual review required.',
+      LMT:  'Manual review required.'
+    },
+    what_would_change_my_mind: [
+      'Sustained deterioration in labor markets and real wage growth.',
+      'Broad AI capex cuts from hyperscalers and enterprise software buyers.',
+      'Durable de-escalation in geopolitical hotspots that materially lowers commodity and logistics risk premia.'
+    ]
+  };
 }
 
 // ─── 4. BUILD OBSIDIAN MARKDOWN ───────────────────────────────────────────────
