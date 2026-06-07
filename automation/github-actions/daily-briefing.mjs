@@ -32,6 +32,8 @@ const feeds = [
   { name: 'Bloomberg',         url: 'https://news.google.com/rss/search?q=site:bloomberg.com+(markets+OR+economy+OR+Fed+OR+inflation)+when:2d&hl=en-US&gl=US&ceid=US:en',              priority: 2 },
   // Broad market-moving news — not bound by theme
   { name: 'Google News Markets','url': 'https://news.google.com/rss/search?q=(markets+OR+stocks+OR+S%26P+500+OR+Fed+OR+earnings+OR+CPI+OR+tariffs)+when:1d&hl=en-US&gl=US&ceid=US:en', priority: 2 },
+  // Economic data releases — dedicated feed for official releases
+  { name: 'Econ Data Releases', url: 'https://news.google.com/rss/search?q=(CPI+OR+PPI+OR+"nonfarm+payroll"+OR+"jobs+report"+OR+GDP+OR+"retail+sales"+OR+PCE+OR+ISM+OR+PMI+OR+JOLTS+OR+"jobless+claims"+OR+"housing+starts"+OR+"consumer+confidence"+OR+"consumer+sentiment"+OR+"durable+goods"+OR+"trade+balance"+OR+FOMC+OR+"Fed+decision"+OR+"interest+rate+decision")+when:1d&hl=en-US&gl=US&ceid=US:en', priority: 3 },
 ];
 
 // ─── 2. FETCH & SCORE ─────────────────────────────────────────────────────────
@@ -100,22 +102,53 @@ async function fetchItems() {
     }
   }
   const seen = new Set();
-  return all
+  const scored = all
     .filter(item => item.title && item.link && !seen.has(item.link) && seen.add(item.link))
     .map(item => ({ ...item, score: score(item, item.feedPriority) }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 30);
+    .sort((a, b) => b.score - a.score);
+
+  const now = Date.now();
+  const hoursAgo = h => now - h * 3.6e6;
+
+  // Overnight: published in the last 14 hours
+  const overnightItems = scored
+    .filter(item => item.pubDate && new Date(item.pubDate).getTime() >= hoursAgo(14))
+    .slice(0, 10);
+
+  // Economic data releases: keyword match on known release names
+  const dataKeywords = /\b(CPI|PPI|PCE|GDP|NFP|nonfarm payroll|jobs report|retail sales|ISM|PMI|JOLTS|jobless claims|initial claims|housing starts|consumer confidence|consumer sentiment|durable goods|trade balance|FOMC|rate decision|Fed funds|unemployment rate|ADP employment)\b/i;
+  const dataItems = scored
+    .filter(item => dataKeywords.test(`${item.title} ${item.contentSnippet || ''}`))
+    .slice(0, 10);
+
+  return { items: scored.slice(0, 30), overnightItems, dataItems };
 }
 
 // ─── 3. AI SYNTHESIS via GROQ ─────────────────────────────────────────────────
 
-async function synthesizeWithAI(items) {
+async function synthesizeWithAI(items, overnightItems, dataItems) {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) throw new Error('GROQ_API_KEY secret is missing. Add it at github.com/jgruggadev/News/settings/secrets/actions');
 
-  const headlineContext = items.slice(0, 25).map((item, i) =>
-    `${i + 1}. ${clean(item.title)}\n   Source: ${clean(item.source)} | ${item.pubDate ? new Date(item.pubDate).toLocaleString('en-US', {timeZone:'America/New_York', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : 'Recent'}\n   ${clean(item.contentSnippet || '').slice(0, 250)}`
-  ).join('\n\n');
+  const fmtItem = (item, i) =>
+    `${i + 1}. ${clean(item.title)}\n   Source: ${clean(item.source)} | ${item.pubDate ? new Date(item.pubDate).toLocaleString('en-US', {timeZone:'America/New_York', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : 'Recent'}\n   ${clean(item.contentSnippet || '').slice(0, 150)}`; // 150 chars is enough context; 250 wastes tokens
+
+  // Build overnight and data contexts first, track which links appear in them
+  const overnightContext = overnightItems.length
+    ? overnightItems.map(fmtItem).join('\n\n')
+    : 'No headlines detected from the past 14 hours.';
+  const dataContext = dataItems.length
+    ? dataItems.map(fmtItem).join('\n\n')
+    : 'No economic data releases detected in the feed today.';
+
+  // Exclude items already sent in overnight/data sections to avoid sending
+  // the same headline 2-3x (which wastes Groq tokens with no added value)
+  const specialLinks = new Set([
+    ...overnightItems.map(i => i.link),
+    ...dataItems.map(i => i.link),
+  ]);
+  const remainingItems = items.filter(i => !specialLinks.has(i.link));
+  const headlineContext = remainingItems.slice(0, 20).map(fmtItem).join('\n\n');
 
   const systemPrompt = `You are a senior macro analyst writing a daily morning briefing for John Albans — a Kelley School of Business finance student with a 3.99 GPA preparing for the Investment Management Workshop (IMW). John is highly intelligent but wants the briefing to be clear, concrete, and immediately useful — not filled with Wall Street jargon.
 
@@ -133,16 +166,47 @@ WRITING RULES — follow these strictly:
 4. Take a clear position. Don't hedge everything with "it could go either way." Tell John what you actually think the data means.
 5. The executive view should read like the most important conversation John will have today — clear, substantive, and worth 10 minutes of his time.
 
+ANTI-REPETITION RULES — this is critical:
+6. Every field must reflect what is GENUINELY NEW today. Do not recycle background context or restate known macro conditions as if they are news. If the biggest story is a continuation of something ongoing, find the specific new development within it — the number that changed, the person who spoke, the country that moved.
+7. Lead with surprise. The most interesting line in the briefing should be the thing a smart analyst would pause on. Boring = useless.
+8. Banned phrases (do not write these, ever): "markets are navigating uncertainty", "investors are watching closely", "amid ongoing concerns", "remains to be seen", "heightened volatility", "risk sentiment", "market participants". Use specific language instead.
+9. The overnight_events and data_releases sections must pull from the actual headlines provided — do not fabricate or generalize. If there is no relevant overnight event, say so plainly. Same for data releases.
+10. The executive_view paragraphs must each reference at least one specific headline, data point, number, or named entity from today's feed. No paragraph should be able to run in yesterday's briefing unchanged.
+
 You MUST respond with ONLY a valid JSON object. No markdown fences, no explanation outside the JSON.`;
 
   const userPrompt = `Today is ${todayReadable}.
 
-Top market headlines and stories (sorted by relevance and recency):
+OVERNIGHT HEADLINES (past 14 hours — use these for overnight_events):
+${overnightContext}
+
+ECONOMIC DATA RELEASE HEADLINES (use these for data_releases):
+${dataContext}
+
+ALL TOP HEADLINES (sorted by relevance and recency):
 ${headlineContext}
 
 Return exactly this JSON structure with real, substantive analysis:
 {
-  "executive_view": "5 clear paragraphs separated by \\n\\n. This is the most important part — write it carefully.\\n\\nParagraph 1: What is the single most important thing happening in markets today? Explain it in plain English with specific details.\\nParagraph 2: What does this mean for the Fed and interest rates? Connect the dots explicitly.\\nParagraph 3: What does this mean for AI and tech? Is the capex cycle confirmed or at risk?\\nParagraph 4: What does this mean for the consumer and the broader economy?\\nParagraph 5: What is the non-obvious thing most investors are getting wrong right now? This is your variant perception — be specific and take a real position.",
+  "overnight_events": [
+    {
+      "headline": "Exact or close paraphrase of the most important overnight headline",
+      "what_happened": "2-3 sentences of what actually occurred — specific names, numbers, decisions",
+      "impact": "1-2 sentences on what this means for markets, rates, earnings, or the macro thesis"
+    }
+  ],
+
+  "data_releases": [
+    {
+      "release": "Name of the data release (e.g. 'April CPI', 'Weekly Jobless Claims')",
+      "reading": "Actual reported figure with units (e.g. '3.4% YoY')",
+      "vs_expected": "How it compared to consensus (e.g. 'above 3.1% expected' or 'in line')",
+      "prior": "Prior period reading if available",
+      "impact": "What does this number change about the macro picture? Be specific — name rate cut odds, Fed language, sector implications."
+    }
+  ],
+
+  "executive_view": "5 clear paragraphs separated by \\n\\n. Each paragraph must reference a specific headline, name, or number from today's feed.\\n\\nParagraph 1: What is the single most important thing happening in markets today? What specifically changed since yesterday?\\nParagraph 2: What does this mean for the Fed and interest rates? Connect the dots explicitly with specific data.\\nParagraph 3: What does this mean for AI and tech? Is there a new signal on capex, demand, or competition?\\nParagraph 4: What does this mean for the consumer and the broader economy?\\nParagraph 5: What is the non-obvious insight a smart analyst would highlight today? The thing most people are missing or mispricing. Be specific and take a real position.",
 
   "what_changed": [
     "5-6 specific things that are different today vs yesterday. Each must include a specific number, name, or event — no vague statements."
@@ -194,7 +258,7 @@ Return exactly this JSON structure with real, substantive analysis:
         { role: 'user',   content: userPrompt }
       ],
       temperature: 0.3,
-      max_tokens: 3000,
+      max_tokens: 4000,
       response_format: { type: 'json_object' }
     })
   });
@@ -205,6 +269,13 @@ Return exactly this JSON structure with real, substantive analysis:
   const data = JSON.parse(responseText);
   const raw = data.choices?.[0]?.message?.content ?? '';
   if (!raw) throw new Error(`Groq returned empty content.`);
+
+  // Log token usage on every run — visible in GitHub Actions logs.
+  // Watch these numbers: input > 6000 or output > 3000 means the prompt is bloated.
+  const usage = data.usage;
+  if (usage) {
+    console.log(`Groq token usage — input: ${usage.prompt_tokens}, output: ${usage.completion_tokens}, total: ${usage.total_tokens}`);
+  }
 
   try {
     const parsed = JSON.parse(raw);
@@ -219,6 +290,31 @@ Return exactly this JSON structure with real, substantive analysis:
 
 function buildMarkdown(items, a) {
   const icon = s => s === 'CONFIRMING' ? '🟢' : s === 'CHALLENGING' ? '🔴' : '🟡';
+
+  const overnightLines = [];
+  if (a.overnight_events && a.overnight_events.length) {
+    for (const ev of a.overnight_events) {
+      overnightLines.push(`### ${ev.headline}`, `**What happened:** ${ev.what_happened}`, `**Impact:** ${ev.impact}`, '');
+    }
+  } else {
+    overnightLines.push('*No major overnight events detected.*', '');
+  }
+
+  const dataLines = [];
+  if (a.data_releases && a.data_releases.length) {
+    for (const dr of a.data_releases) {
+      dataLines.push(
+        `### ${dr.release}`,
+        `- **Reading:** ${dr.reading}${dr.vs_expected ? ` (${dr.vs_expected})` : ''}`,
+        dr.prior ? `- **Prior:** ${dr.prior}` : null,
+        `- **Impact:** ${dr.impact}`,
+        ''
+      ).filter(Boolean);
+    }
+  } else {
+    dataLines.push('*No major economic data releases today.*', '');
+  }
+
   return [
     '---',
     `date: ${today}`,
@@ -229,6 +325,16 @@ function buildMarkdown(items, a) {
     '',
     '> [[Latest Daily Briefing]] | [[Living Macro Thesis]] | [[Feedback Log]] | [[IMW Prep Hub]]',
     '',
+    '---',
+    '',
+    '## Overnight & Breaking',
+    '',
+    ...overnightLines,
+    '---',
+    '',
+    '## Economic Data Releases',
+    '',
+    ...dataLines,
     '---',
     '',
     '## Executive View',
@@ -324,6 +430,27 @@ function buildHtml(items, a) {
     return '#888';
   };
 
+  // Overnight events HTML
+  const overnightHtml = (a.overnight_events && a.overnight_events.length)
+    ? a.overnight_events.map(ev => `
+      <div style="margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid #ede9e2;">
+        <p style="margin:0 0 6px;font-size:14px;font-weight:700;color:#1a1a1a;line-height:1.5;font-family:Arial,sans-serif;">${ev.headline}</p>
+        <p style="margin:0 0 4px;font-size:13px;color:#444;line-height:1.6;font-family:Arial,sans-serif;">${ev.what_happened}</p>
+        <p style="margin:0;font-size:12px;color:#777;line-height:1.5;font-family:Arial,sans-serif;font-style:italic;">→ ${ev.impact}</p>
+      </div>`).join('')
+    : `<p style="margin:0;font-size:13px;color:#888;font-family:Arial,sans-serif;font-style:italic;">No major overnight events detected.</p>`;
+
+  // Economic data releases HTML
+  const dataHtml = (a.data_releases && a.data_releases.length)
+    ? a.data_releases.map(dr => `
+      <div style="margin-bottom:16px;padding:14px 16px;background:#f7f4ef;border-radius:4px;border-left:3px solid #004B87;">
+        <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#004B87;font-family:Arial,sans-serif;">${dr.release}</p>
+        <p style="margin:0 0 4px;font-size:15px;font-weight:700;color:#1a1a1a;font-family:Arial,sans-serif;">${dr.reading}${dr.vs_expected ? ` <span style="font-size:12px;font-weight:400;color:#666;">(${dr.vs_expected})</span>` : ''}</p>
+        ${dr.prior ? `<p style="margin:0 0 4px;font-size:12px;color:#888;font-family:Arial,sans-serif;">Prior: ${dr.prior}</p>` : ''}
+        <p style="margin:0;font-size:13px;color:#444;line-height:1.5;font-family:Arial,sans-serif;">${dr.impact}</p>
+      </div>`).join('')
+    : `<p style="margin:0;font-size:13px;color:#888;font-family:Arial,sans-serif;font-style:italic;">No major economic data releases today.</p>`;
+
   const execParas = a.executive_view.split('\n\n')
     .map(p => `<p style="margin:0 0 20px;font-size:16px;color:#1a1a1a;line-height:1.8;font-family:Georgia,serif;">${p.trim()}</p>`)
     .join('');
@@ -404,6 +531,18 @@ function buildHtml(items, a) {
   </div>
 
   <div style="padding:40px 44px;">
+
+    <!-- OVERNIGHT & BREAKING -->
+    <div style="margin-bottom:40px;">
+      <p style="margin:0 0 20px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#999;font-family:Arial,sans-serif;padding-bottom:12px;border-bottom:2px solid #111;">Overnight &amp; Breaking</p>
+      ${overnightHtml}
+    </div>
+
+    <!-- ECONOMIC DATA RELEASES -->
+    <div style="margin-bottom:40px;">
+      <p style="margin:0 0 16px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#004B87;font-family:Arial,sans-serif;padding-bottom:12px;border-bottom:2px solid #004B87;">Economic Data Releases</p>
+      ${dataHtml}
+    </div>
 
     <!-- EXECUTIVE VIEW -->
     <div style="margin-bottom:40px;">
@@ -505,11 +644,11 @@ async function sendEmail(markdown, html) {
 
 console.log(`Starting briefing for ${todayReadable}...`);
 
-const items = await fetchItems();
+const { items, overnightItems, dataItems } = await fetchItems();
 if (!items.length) throw new Error('No RSS items fetched — check feed URLs.');
-console.log(`Fetched ${items.length} items from ${new Set(items.map(i=>i.source)).size} sources.`);
+console.log(`Fetched ${items.length} items from ${new Set(items.map(i=>i.source)).size} sources. Overnight: ${overnightItems.length}, Data releases: ${dataItems.length}.`);
 
-const analysis = await synthesizeWithAI(items);
+const analysis = await synthesizeWithAI(items, overnightItems, dataItems);
 
 const markdown = buildMarkdown(items, analysis);
 const html     = buildHtml(items, analysis);

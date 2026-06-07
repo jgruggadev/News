@@ -6,12 +6,19 @@ on:
     # 9:00 AM America/New_York during daylight saving time. Change to 14:00 UTC during standard time.
     - cron: '0 13 * * *'
 
+# Only one run at a time — prevents duplicate jobs if workflow_dispatch
+# is clicked while the scheduler is already running (or clicked twice).
+concurrency:
+  group: daily-briefing
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
 jobs:
   briefing:
     runs-on: ubuntu-latest
+    timeout-minutes: 10   # hard ceiling — job is killed if it hangs past 10 min
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -20,6 +27,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'     # cache node_modules — saves ~30s and some runner minutes
 
       - name: Install dependencies
         run: npm install nodemailer rss-parser
@@ -32,6 +40,7 @@ jobs:
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           SMTP_FROM: ${{ secrets.SMTP_FROM }}
           BRIEFING_TO: ${{ secrets.BRIEFING_TO }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: node automation/github-actions/daily-briefing.mjs
 
       - name: Commit updated Obsidian notes
