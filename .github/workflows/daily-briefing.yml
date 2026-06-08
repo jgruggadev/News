@@ -1,10 +1,7 @@
 name: Daily Macro Briefing
 
 on:
-  workflow_dispatch:
-  schedule:
-    # 8:00 AM ET during EDT (Mar–Nov). Change to '0 13 * * *' for EST (Nov–Mar).
-    - cron: '0 12 * * *'
+  workflow_dispatch:  # manual trigger only — daily schedule handled by Cowork cron job
 
 permissions:
   contents: write
