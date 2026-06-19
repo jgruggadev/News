@@ -303,13 +303,14 @@ function buildMarkdown(items, a) {
   const dataLines = [];
   if (a.data_releases && a.data_releases.length) {
     for (const dr of a.data_releases) {
-      dataLines.push(
+      const releaseLines = [
         `### ${dr.release}`,
         `- **Reading:** ${dr.reading}${dr.vs_expected ? ` (${dr.vs_expected})` : ''}`,
         dr.prior ? `- **Prior:** ${dr.prior}` : null,
         `- **Impact:** ${dr.impact}`,
         ''
-      ).filter(Boolean);
+      ].filter(line => line != null);
+      dataLines.push(...releaseLines);
     }
   } else {
     dataLines.push('*No major economic data releases today.*', '');
