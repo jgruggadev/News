@@ -207,7 +207,7 @@ Return exactly this JSON structure with real, substantive analysis:
     }
   ],
 
-  "executive_view": "A tight synopsis of what matters most today — 3 short paragraphs separated by \\n\\n, each <=55 words. The reader already understands the macro backdrop, so SKIP the basics, do not re-explain known conditions, and lead with what is NEW and what it means. Each paragraph must cite a specific headline, number, or named entity from today's feed. Paragraph 1: the single most important development today and why it matters. Paragraph 2: the read-through for the Fed/rates and for AI/tech. Paragraph 3: the consumer plus the one non-obvious insight worth acting on — take a real position.",
+  "executive_view": "A concise but substantive synopsis of what matters most today — 3 short paragraphs separated by \\n\\n, each 2-4 full sentences. The reader already understands the macro backdrop, so do not re-explain the basics; lead with what is NEW, add a sentence or two of the key detail and why it matters, then stop. Write in complete sentences and cite specific headlines, numbers, or named entities. Paragraph 1: the single most important development today and its market implication. Paragraph 2: the read-through for the Fed/rates and for AI/tech. Paragraph 3: the consumer plus the one non-obvious insight worth acting on — take a clear position.",
 
   "what_changed": [
     "5-6 specific things that are different today vs yesterday. Each must include a specific number, name, or event — no vague statements."
@@ -319,10 +319,6 @@ function buildMarkdown(items, a, interestingMd = '') {
     '',
     a.executive_view,
     '',
-    "**Today's key stories:**",
-    '',
-    ...items.slice(0, 6).map(item => `- [${clean(item.title)}](${item.link}) — *${clean(item.source)}*`),
-    '',
     '---',
     '',
     '## What Changed Today',
@@ -338,11 +334,15 @@ function buildMarkdown(items, a, interestingMd = '') {
     '---',
     '',
     ...(interestingMd ? [interestingMd, '---', ''] : []),
-    '## Source Headlines',
+    '## Headlines',
     '',
-    ...items.slice(0, 25).map(item =>
-      `- [${clean(item.title)}](${item.link}) — *${clean(item.source)}*`
-    ),
+    "**Today's top stories**",
+    '',
+    ...items.slice(0, 6).map(item => `- [${clean(item.title)}](${item.link}) — *${clean(item.source)}*`),
+    '',
+    '**More headlines**',
+    '',
+    ...items.slice(6, 25).map(item => `- [${clean(item.title)}](${item.link}) — *${clean(item.source)}*`),
     '',
     '---',
     '',
@@ -408,9 +408,9 @@ function buildHtml(items, a, interestingHtml = '') {
     .map(e => `<li style="margin:9px 0;font-size:14px;color:#1a1a1a;line-height:1.6;font-family:Arial,sans-serif;">${e}</li>`)
     .join('');
 
-  // Group sources and show top items
+  // Group remaining sources (the top stories are listed separately above)
   const topSources = {};
-  for (const item of items.slice(0, 25)) {
+  for (const item of items.slice(6, 25)) {
     const src = clean(item.source);
     if (!topSources[src]) topSources[src] = [];
     if (topSources[src].length < 3) topSources[src].push(item);
@@ -473,7 +473,6 @@ function buildHtml(items, a, interestingHtml = '') {
     <div style="margin-bottom:40px;">
       <p style="margin:0 0 20px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#999;font-family:Arial,sans-serif;padding-bottom:12px;border-bottom:2px solid #111;">Executive View</p>
       ${execParas}
-      ${keyStoriesHtml}
     </div>
 
     <!-- WHAT CHANGED -->
@@ -490,9 +489,10 @@ function buildHtml(items, a, interestingHtml = '') {
 
     ${interestingHtml}
 
-    <!-- SOURCES -->
+    <!-- HEADLINES -->
     <div style="border-top:1px solid #e8e3da;padding-top:32px;">
-      <p style="margin:0 0 20px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#999;font-family:Arial,sans-serif;">Source Headlines</p>
+      <p style="margin:0 0 20px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#999;font-family:Arial,sans-serif;">Headlines</p>
+      ${keyStoriesHtml}
       ${sourceBlocks}
     </div>
 
