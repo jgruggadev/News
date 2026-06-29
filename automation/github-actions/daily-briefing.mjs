@@ -173,6 +173,7 @@ ANTI-REPETITION RULES — this is critical:
 8. Banned phrases (do not write these, ever): "markets are navigating uncertainty", "investors are watching closely", "amid ongoing concerns", "remains to be seen", "heightened volatility", "risk sentiment", "market participants". Use specific language instead.
 9. The overnight_events and data_releases sections must pull from the actual headlines provided — do not fabricate or generalize. If there is no relevant overnight event, say so plainly. Same for data releases.
 10. The executive_view paragraphs must each reference at least one specific headline, data point, number, or named entity from today's feed. No paragraph should be able to run in yesterday's briefing unchanged.
+11. Economic data releases: ALWAYS lead with the actual number, then compare it to the prior reading / consensus / recent trend (history), then say what it means. Every entry in data_releases MUST contain a real figure from the feed — if a release has no concrete number, leave it out entirely rather than listing it without one.
 
 You MUST respond with ONLY a valid JSON object. No markdown fences, no explanation outside the JSON.`;
 
@@ -200,10 +201,10 @@ Return exactly this JSON structure with real, substantive analysis:
   "data_releases": [
     {
       "release": "Name of the data release (e.g. 'April CPI', 'Weekly Jobless Claims')",
-      "reading": "Actual reported figure with units (e.g. '3.4% YoY')",
-      "vs_expected": "How it compared to consensus (e.g. 'above 3.1% expected' or 'in line')",
-      "prior": "Prior period reading if available",
-      "impact": "What does this number change about the macro picture? Be specific — name rate cut odds, Fed language, sector implications."
+      "reading": "REQUIRED — the actual reported figure as a concrete number with units (e.g. '3.4% YoY', '227K jobs', 'ISM 49.2'). Only include a release if a real number is present in the feed. Never list a release without a number and never invent one.",
+      "vs_expected": "The number vs consensus (e.g. 'above the 3.1% expected' or 'in line'). If consensus is not in the feed, write 'consensus n/a'.",
+      "prior": "REQUIRED historical comparison — the prior-period reading and the trend, so the number has context (e.g. 'up from 3.1% last month, highest since June 2025' or 'vs ~220K 4-week average'). Always compare the number to history.",
+      "impact": "What this number MEANS — one or two concrete sentences: which way it pushes rate-cut odds or Fed language, and the sector/market read-through."
     }
   ],
 
@@ -276,8 +277,8 @@ function buildMarkdown(items, a, interestingMd = '') {
       const releaseLines = [
         `### ${dr.release}`,
         `- **Reading:** ${dr.reading}${dr.vs_expected ? ` (${dr.vs_expected})` : ''}`,
-        dr.prior ? `- **Prior:** ${dr.prior}` : null,
-        `- **Impact:** ${dr.impact}`,
+        dr.prior ? `- **Vs history:** ${dr.prior}` : null,
+        `- **What it means:** ${dr.impact}`,
         ''
       ].filter(line => line != null);
       dataLines.push(...releaseLines);
@@ -384,8 +385,8 @@ function buildHtml(items, a, interestingHtml = '') {
       <div style="margin-bottom:16px;padding:14px 16px;background:#f7f4ef;border-radius:4px;border-left:3px solid #004B87;">
         <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#004B87;font-family:Arial,sans-serif;">${dr.release}</p>
         <p style="margin:0 0 4px;font-size:15px;font-weight:700;color:#1a1a1a;font-family:Arial,sans-serif;">${dr.reading}${dr.vs_expected ? ` <span style="font-size:12px;font-weight:400;color:#666;">(${dr.vs_expected})</span>` : ''}</p>
-        ${dr.prior ? `<p style="margin:0 0 4px;font-size:12px;color:#888;font-family:Arial,sans-serif;">Prior: ${dr.prior}</p>` : ''}
-        <p style="margin:0;font-size:13px;color:#444;line-height:1.5;font-family:Arial,sans-serif;">${dr.impact}</p>
+        ${dr.prior ? `<p style="margin:0 0 4px;font-size:12px;color:#888;font-family:Arial,sans-serif;"><strong>Vs history:</strong> ${dr.prior}</p>` : ''}
+        <p style="margin:0;font-size:13px;color:#444;line-height:1.5;font-family:Arial,sans-serif;"><strong>What it means:</strong> ${dr.impact}</p>
       </div>`).join('')
     : `<p style="margin:0;font-size:13px;color:#888;font-family:Arial,sans-serif;font-style:italic;">No major economic data releases today.</p>`;
 
