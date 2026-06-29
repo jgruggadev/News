@@ -207,43 +207,14 @@ Return exactly this JSON structure with real, substantive analysis:
     }
   ],
 
-  "executive_view": "5 clear paragraphs separated by \\n\\n. Each paragraph must reference a specific headline, name, or number from today's feed.\\n\\nParagraph 1: What is the single most important thing happening in markets today? What specifically changed since yesterday?\\nParagraph 2: What does this mean for the Fed and interest rates? Connect the dots explicitly with specific data.\\nParagraph 3: What does this mean for AI and tech? Is there a new signal on capex, demand, or competition?\\nParagraph 4: What does this mean for the consumer and the broader economy?\\nParagraph 5: What is the non-obvious insight a smart analyst would highlight today? The thing most people are missing or mispricing. Be specific and take a real position.",
+  "executive_view": "A tight synopsis of what matters most today — 3 short paragraphs separated by \\n\\n, each <=55 words. The reader already understands the macro backdrop, so SKIP the basics, do not re-explain known conditions, and lead with what is NEW and what it means. Each paragraph must cite a specific headline, number, or named entity from today's feed. Paragraph 1: the single most important development today and why it matters. Paragraph 2: the read-through for the Fed/rates and for AI/tech. Paragraph 3: the consumer plus the one non-obvious insight worth acting on — take a real position.",
 
   "what_changed": [
     "5-6 specific things that are different today vs yesterday. Each must include a specific number, name, or event — no vague statements."
   ],
 
-  "thesis_test": {
-    "consumer": {
-      "signal": "CONFIRMING or NEUTRAL or CHALLENGING",
-      "reasoning": "One clear sentence explaining what today's evidence says about whether the consumer is holding up."
-    },
-    "fed": {
-      "signal": "CONFIRMING or NEUTRAL or CHALLENGING",
-      "reasoning": "One clear sentence about what today's data implies for Fed policy and rate expectations."
-    },
-    "ai": {
-      "signal": "CONFIRMING or NEUTRAL or CHALLENGING",
-      "reasoning": "One clear sentence about what today's news implies for the AI capex cycle and infrastructure spending."
-    }
-  },
-
-  "variant_perception": "2-3 sentences identifying something the market is mispricing or misunderstanding right now. Be specific — name the stock, sector, or data point. Avoid generic observations.",
-
-  "deep_dive_question": "One specific research question John should investigate today. Name a company, a specific data release, or an exact relationship to look into.",
-
-  "watchlist": {
-    "NVDA": "One sentence: what does today's news mean specifically for Nvidia — demand, valuation, competition, or supply chain?",
-    "WMT": "One sentence: what does today's news mean for Walmart as a read on low-end consumer health?",
-    "LMT": "One sentence: what does today's news mean for Lockheed Martin — defense budgets, geopolitical demand, or backlog?"
-  },
-
   "forward_look": [
     "List 4-6 specific upcoming events, data releases, or developing situations to watch over the next 3-7 days. For each: name the event, when it happens (specific date or day if known), what to look for, and why it matters. Format: 'EVENT (DATE/TIMING): What to watch and why it matters.'"
-  ],
-
-  "what_would_change_my_mind": [
-    "3 specific, concrete conditions that would force a revision of the current thesis. Each should name a specific threshold, data point, or event — not a vague direction."
   ]
 }`;
 
@@ -290,8 +261,6 @@ Return exactly this JSON structure with real, substantive analysis:
 // ─── 4. BUILD OBSIDIAN MARKDOWN ───────────────────────────────────────────────
 
 function buildMarkdown(items, a, interestingMd = '') {
-  const icon = s => s === 'CONFIRMING' ? '🟢' : s === 'CHALLENGING' ? '🔴' : '🟡';
-
   const overnightLines = [];
   if (a.overnight_events && a.overnight_events.length) {
     for (const ev of a.overnight_events) {
@@ -329,6 +298,13 @@ function buildMarkdown(items, a, interestingMd = '') {
     '',
     '---',
     '',
+    '## Daily Briefings',
+    '',
+    '- [FT News Briefing](https://www.ft.com/ft-news-briefing)',
+    "- [The Barron's Daily](https://www.barrons.com/topics/the-barrons-daily?mod=article_flashline)",
+    '',
+    '---',
+    '',
     '## Overnight & Breaking',
     '',
     ...overnightLines,
@@ -343,6 +319,10 @@ function buildMarkdown(items, a, interestingMd = '') {
     '',
     a.executive_view,
     '',
+    "**Today's key stories:**",
+    '',
+    ...items.slice(0, 6).map(item => `- [${clean(item.title)}](${item.link}) — *${clean(item.source)}*`),
+    '',
     '---',
     '',
     '## What Changed Today',
@@ -351,50 +331,9 @@ function buildMarkdown(items, a, interestingMd = '') {
     '',
     '---',
     '',
-    '## Thesis Test',
-    '',
-    `**The Consumer** ${icon(a.thesis_test.consumer.signal)} ${a.thesis_test.consumer.signal}`,
-    `> ${a.thesis_test.consumer.reasoning}`,
-    '',
-    `**The Federal Reserve** ${icon(a.thesis_test.fed.signal)} ${a.thesis_test.fed.signal}`,
-    `> ${a.thesis_test.fed.reasoning}`,
-    '',
-    `**AI** ${icon(a.thesis_test.ai.signal)} ${a.thesis_test.ai.signal}`,
-    `> ${a.thesis_test.ai.reasoning}`,
-    '',
-    '---',
-    '',
-    '## Variant Perception',
-    '',
-    a.variant_perception,
-    '',
-    '---',
-    '',
-    "## Today's Deep-Dive Question",
-    '',
-    `> ${a.deep_dive_question}`,
-    '',
-    '---',
-    '',
-    '## Watchlist',
-    '',
-    `**NVDA** — ${a.watchlist.NVDA}`,
-    '',
-    `**WMT** — ${a.watchlist.WMT}`,
-    '',
-    `**LMT** — ${a.watchlist.LMT}`,
-    '',
-    '---',
-    '',
     '## Forward Look — What to Monitor',
     '',
     ...a.forward_look.map(e => `- ${e}`),
-    '',
-    '---',
-    '',
-    '## What Would Change My Mind',
-    '',
-    ...a.what_would_change_my_mind.map(c => `- ${c}`),
     '',
     '---',
     '',
@@ -414,10 +353,6 @@ function buildMarkdown(items, a, interestingMd = '') {
 // ─── 5. BUILD HTML EMAIL ──────────────────────────────────────────────────────
 
 function buildHtml(items, a, interestingHtml = '') {
-  const sigColor = s => s === 'CONFIRMING' ? '#1D9E75' : s === 'CHALLENGING' ? '#D85A30' : '#888780';
-  const sigBg    = s => s === 'CONFIRMING' ? '#E1F5EE' : s === 'CHALLENGING' ? '#FAECE7' : '#F1EFE8';
-  const sigIcon  = s => s === 'CONFIRMING' ? '▲' : s === 'CHALLENGING' ? '▼' : '—';
-
   // Source color map — color-code by source for quick scanning
   const sourceColors = {
     'WSJ': '#004B87', 'Wall Street Journal': '#004B87',
@@ -455,45 +390,22 @@ function buildHtml(items, a, interestingHtml = '') {
     : `<p style="margin:0;font-size:13px;color:#888;font-family:Arial,sans-serif;font-style:italic;">No major economic data releases today.</p>`;
 
   const execParas = a.executive_view.split('\n\n')
-    .map(p => `<p style="margin:0 0 20px;font-size:16px;color:#1a1a1a;line-height:1.8;font-family:Georgia,serif;">${p.trim()}</p>`)
+    .map(p => `<p style="margin:0 0 16px;font-size:15px;color:#1a1a1a;line-height:1.7;font-family:Georgia,serif;">${p.trim()}</p>`)
     .join('');
+
+  // Linked key headlines shown inside the Executive View.
+  const keyStoriesHtml =
+    `<p style="margin:18px 0 8px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#999;font-family:Arial,sans-serif;">Today's Key Stories</p><ul style="margin:0;padding:0 0 0 18px;">` +
+    items.slice(0, 6).map(item =>
+      `<li style="margin:6px 0;font-size:13px;line-height:1.5;font-family:Arial,sans-serif;"><a href="${item.link}" style="color:#1a1a1a;text-decoration:none;">${clean(item.title)}</a> <span style="color:#999;">— ${clean(item.source)}</span></li>`
+    ).join('') + '</ul>';
 
   const changedBullets = a.what_changed
     .map(c => `<li style="margin:8px 0;font-size:14px;color:#333;line-height:1.6;font-family:Arial,sans-serif;">${c}</li>`)
     .join('');
 
-  const thesisRows = [
-    {label:'The Consumer', d:a.thesis_test.consumer},
-    {label:'The Federal Reserve', d:a.thesis_test.fed},
-    {label:'AI Capex Cycle', d:a.thesis_test.ai}
-  ].map(({label,d}) => `
-    <tr>
-      <td style="padding:12px 0;border-bottom:1px solid #ede9e2;vertical-align:middle;width:150px;">
-        <span style="font-size:13px;font-weight:700;color:#1a1a1a;font-family:Arial,sans-serif;">${label}</span>
-      </td>
-      <td style="padding:12px 10px;border-bottom:1px solid #ede9e2;vertical-align:middle;width:130px;">
-        <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:${sigBg(d.signal)};color:${sigColor(d.signal)};font-family:Arial,sans-serif;">
-          ${sigIcon(d.signal)} ${d.signal}
-        </span>
-      </td>
-      <td style="padding:12px 0;border-bottom:1px solid #ede9e2;vertical-align:middle;font-size:13px;color:#444;line-height:1.6;font-family:Arial,sans-serif;">${d.reasoning}</td>
-    </tr>`).join('');
-
-  const watchlistRows = [['NVDA',a.watchlist.NVDA],['WMT',a.watchlist.WMT],['LMT',a.watchlist.LMT]]
-    .map(([t,txt]) => `
-    <tr>
-      <td style="padding:10px 0;border-bottom:1px solid #ede9e2;vertical-align:top;width:60px;">
-        <code style="font-size:13px;font-weight:700;color:#004B87;background:#f0f4f8;padding:2px 6px;border-radius:4px;">${t}</code>
-      </td>
-      <td style="padding:10px 0 10px 14px;border-bottom:1px solid #ede9e2;vertical-align:top;font-size:13px;color:#444;line-height:1.6;font-family:Arial,sans-serif;">${txt}</td>
-    </tr>`).join('');
-
   const forwardItems = (a.forward_look || [])
     .map(e => `<li style="margin:9px 0;font-size:14px;color:#1a1a1a;line-height:1.6;font-family:Arial,sans-serif;">${e}</li>`)
-    .join('');
-
-  const mindBullets = a.what_would_change_my_mind
-    .map(c => `<li style="margin:8px 0;font-size:14px;color:#333;line-height:1.6;font-family:Arial,sans-serif;">${c}</li>`)
     .join('');
 
   // Group sources and show top items
@@ -535,6 +447,16 @@ function buildHtml(items, a, interestingHtml = '') {
 
   <div style="padding:40px 44px;">
 
+    <!-- DAILY BRIEFINGS -->
+    <div style="margin-bottom:36px;padding:14px 18px;background:#f7f4ef;border-radius:4px;border-left:4px solid #111;">
+      <p style="margin:0 0 8px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#999;font-family:Arial,sans-serif;">Your Daily Briefings</p>
+      <p style="margin:0;font-size:14px;font-family:Arial,sans-serif;line-height:1.7;">
+        <a href="https://www.ft.com/ft-news-briefing" style="color:#004B87;text-decoration:none;font-weight:700;">FT News Briefing</a>
+        &nbsp;·&nbsp;
+        <a href="https://www.barrons.com/topics/the-barrons-daily?mod=article_flashline" style="color:#C41230;text-decoration:none;font-weight:700;">The Barron's Daily</a>
+      </p>
+    </div>
+
     <!-- OVERNIGHT & BREAKING -->
     <div style="margin-bottom:40px;">
       <p style="margin:0 0 20px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#999;font-family:Arial,sans-serif;padding-bottom:12px;border-bottom:2px solid #111;">Overnight &amp; Breaking</p>
@@ -551,6 +473,7 @@ function buildHtml(items, a, interestingHtml = '') {
     <div style="margin-bottom:40px;">
       <p style="margin:0 0 20px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#999;font-family:Arial,sans-serif;padding-bottom:12px;border-bottom:2px solid #111;">Executive View</p>
       ${execParas}
+      ${keyStoriesHtml}
     </div>
 
     <!-- WHAT CHANGED -->
@@ -559,40 +482,10 @@ function buildHtml(items, a, interestingHtml = '') {
       <ul style="margin:0;padding:0 0 0 18px;">${changedBullets}</ul>
     </div>
 
-    <!-- THESIS TEST -->
-    <div style="margin-bottom:40px;">
-      <p style="margin:0 0 16px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#999;font-family:Arial,sans-serif;padding-bottom:12px;border-bottom:1px solid #e8e3da;">Thesis Test</p>
-      <table style="width:100%;border-collapse:collapse;">${thesisRows}</table>
-    </div>
-
-    <!-- VARIANT PERCEPTION -->
-    <div style="margin-bottom:40px;border-left:4px solid #111;padding:2px 0 2px 24px;">
-      <p style="margin:0 0 10px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#999;font-family:Arial,sans-serif;">Variant Perception</p>
-      <p style="margin:0;font-size:15px;color:#1a1a1a;line-height:1.8;font-style:italic;font-family:Georgia,serif;">${a.variant_perception}</p>
-    </div>
-
-    <!-- DEEP DIVE -->
-    <div style="margin-bottom:40px;background:#111;border-radius:4px;padding:24px 28px;">
-      <p style="margin:0 0 10px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#555;font-family:Arial,sans-serif;">Today's Research Question</p>
-      <p style="margin:0;font-size:15px;color:#fff;line-height:1.7;font-family:Georgia,serif;">${a.deep_dive_question}</p>
-    </div>
-
-    <!-- WATCHLIST -->
-    <div style="margin-bottom:40px;">
-      <p style="margin:0 0 16px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#999;font-family:Arial,sans-serif;padding-bottom:12px;border-bottom:1px solid #e8e3da;">Watchlist Read-Through</p>
-      <table style="width:100%;border-collapse:collapse;">${watchlistRows}</table>
-    </div>
-
     <!-- FORWARD LOOK -->
     <div style="margin-bottom:40px;background:#f0f4f8;border-radius:4px;padding:24px 28px;border-left:4px solid #004B87;">
       <p style="margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#004B87;font-family:Arial,sans-serif;">Forward Look — Watch This Week</p>
       <ul style="margin:0;padding:0 0 0 18px;">${forwardItems}</ul>
-    </div>
-
-    <!-- WHAT WOULD CHANGE MY MIND -->
-    <div style="margin-bottom:40px;background:#f7f4ef;border-radius:4px;padding:24px 28px;">
-      <p style="margin:0 0 14px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#999;font-family:Arial,sans-serif;">What Would Change My Mind</p>
-      <ul style="margin:0;padding:0 0 0 18px;">${mindBullets}</ul>
     </div>
 
     ${interestingHtml}
