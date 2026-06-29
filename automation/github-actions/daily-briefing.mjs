@@ -3,6 +3,7 @@ import path from 'node:path';
 import process from 'node:process';
 import nodemailer from 'nodemailer';
 import Parser from 'rss-parser';
+import { getInterestingSection } from './interesting-headlines.mjs';
 
 const parser = new Parser({ timeout: 15000 });
 const root = process.cwd();
@@ -288,7 +289,7 @@ Return exactly this JSON structure with real, substantive analysis:
 
 // ─── 4. BUILD OBSIDIAN MARKDOWN ───────────────────────────────────────────────
 
-function buildMarkdown(items, a) {
+function buildMarkdown(items, a, interestingMd = '') {
   const icon = s => s === 'CONFIRMING' ? '🟢' : s === 'CHALLENGING' ? '🔴' : '🟡';
 
   const overnightLines = [];
@@ -397,6 +398,7 @@ function buildMarkdown(items, a) {
     '',
     '---',
     '',
+    ...(interestingMd ? [interestingMd, '---', ''] : []),
     '## Source Headlines',
     '',
     ...items.slice(0, 25).map(item =>
@@ -411,7 +413,7 @@ function buildMarkdown(items, a) {
 
 // ─── 5. BUILD HTML EMAIL ──────────────────────────────────────────────────────
 
-function buildHtml(items, a) {
+function buildHtml(items, a, interestingHtml = '') {
   const sigColor = s => s === 'CONFIRMING' ? '#1D9E75' : s === 'CHALLENGING' ? '#D85A30' : '#888780';
   const sigBg    = s => s === 'CONFIRMING' ? '#E1F5EE' : s === 'CHALLENGING' ? '#FAECE7' : '#F1EFE8';
   const sigIcon  = s => s === 'CONFIRMING' ? '▲' : s === 'CHALLENGING' ? '▼' : '—';
@@ -593,6 +595,8 @@ function buildHtml(items, a) {
       <ul style="margin:0;padding:0 0 0 18px;">${mindBullets}</ul>
     </div>
 
+    ${interestingHtml}
+
     <!-- SOURCES -->
     <div style="border-top:1px solid #e8e3da;padding-top:32px;">
       <p style="margin:0 0 20px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#999;font-family:Arial,sans-serif;">Source Headlines</p>
@@ -651,8 +655,17 @@ console.log(`Fetched ${items.length} items from ${new Set(items.map(i=>i.source)
 
 const analysis = await synthesizeWithAI(items, overnightItems, dataItems);
 
-const markdown = buildMarkdown(items, analysis);
-const html     = buildHtml(items, analysis);
+// Interesting Headlines — curated bottom section. Fail-soft: never blocks the briefing.
+let interesting = { markdown: '', html: '' };
+try {
+  interesting = await getInterestingSection(process.env.GROQ_API_KEY);
+  console.log(`Interesting Headlines: ${interesting.markdown ? 'included' : 'skipped (none fetched)'}.`);
+} catch (err) {
+  console.warn(`Interesting Headlines skipped (non-fatal): ${err.message}`);
+}
+
+const markdown = buildMarkdown(items, analysis, interesting.markdown);
+const html     = buildHtml(items, analysis, interesting.html);
 
 await writeBriefing(markdown);
 await sendEmail(markdown, html);
